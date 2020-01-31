@@ -23,11 +23,30 @@ class FlaskPrometheusView:
         self.met_funcs = {
             'storage_total': get_storage_total,
             'storage_used': get_storage_used,
+            'storage_com': get_storage_com,
             'storage_pfs_total': get_storage_pfs_total,
             'storage_pfs_used': get_storage_pfs_used,
             'storage_sof_total': get_storage_sof_total,
             'storage_sof_used': get_storage_sof_used,
-        }
+            'storage_el_total': get_storage_el_total,
+            'storage_el_used': get_storage_el_used,
+            'lotus_cores_count': get_lotus_cores_count,
+            'lotus_hosts_count': get_lotus_hosts_count,
+            'lotus_mem_total': get_lotus_mem_total,
+            'lotus_tbmonth_in': get_lotus_tbmonth_in,
+            'lotus_tbmonth_out': get_lotus_tbmonth_out,
+            'lotus_network_in': get_lotus_network_in,
+            'lotus_network_out': get_lotus_network_out,
+            'lotus_core_hours': get_lotus_core_hours,
+            'lotus_util': get_lotus_util,
+            'openstack_vms_count': get_openstack_vms_count,
+            'openstack_vms_cpus_quota': get_openstack_vms_cpus_quota,
+            'openstack_vms_cpus_used': get_openstack_vms_cpus_used,
+            'openstack_vms_ram_quota': get_openstack_vms_ram_quota,
+            'openstack_vms_ram_used': get_openstack_vms_ram_used,
+            'openstack_vms_storage_quota': get_openstack_vms_storage_quota,
+            'openstack_vms_storage_used': get_openstack_vms_storage_used,
+       }
 
 
     def __call__(self):
@@ -56,6 +75,7 @@ def parse_metrics_config(fname='./metrics.ini'):
 def flask_app_factory():
 
     app = Flask(__name__)
+    collector = pc.CollectorRegistry()
 
     req_metrics = parse_metrics_config()
     service_status_list = {}
@@ -64,7 +84,8 @@ def flask_app_factory():
         gauge = pc.Gauge(m, m)
         service_status_list[m] = (gauge)
 
-    flask_view = FlaskPrometheusView(service_status_list, req_metrics)
+    flask_view = FlaskPrometheusView(service_status_list, 
+                                    req_metrics)
 
     path = '/metrics/'
     app.add_url_rule(path, 'metrics', flask_view)
