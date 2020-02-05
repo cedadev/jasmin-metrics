@@ -1,4 +1,4 @@
-import utils as ut
+import scripts.utils as ut
 import requests
 import scipy.integrate as it
 

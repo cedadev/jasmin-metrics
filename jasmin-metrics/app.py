@@ -2,19 +2,16 @@ from flask import Flask, Response
 import prometheus_client as pc
 import influxdb
 import configparser
-from archive_metrics import arhive_metrics
-from lotus_metrics import lotus_metrics
-from managed_cloud_metrics import mc_metrics
-from unmanaged_cloud_metrics import umc_metrics
-from network_metrics import network_metrics
-from storage_metrics import storage_metrics
-from tape_metrics import tape_metrics
-from users_metrics import users_metrics
-from power_metrics import power_metrics
+from scripts.archive_metrics import archive_metrics
+from scripts.lotus_metrics import lotus_metrics
+from scripts.managed_cloud_metrics import mc_metrics
+from scripts.unmanaged_cloud_metrics import umc_metrics
+from scripts.network_metrics import network_metrics
+from scripts.storage_metrics import storage_metrics
+from scripts.tape_metrics import tape_metrics
+from scripts.users_metrics import users_metrics
+from scripts.power_metrics import power_metrics
 
-
-def get_total_storage():
-    return 1
 
 class FlaskPrometheusView:
     '''Make a view for each test to be executed.  Express this view as a class

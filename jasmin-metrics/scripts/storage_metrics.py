@@ -1,4 +1,4 @@
-import utils as ut
+import scripts.utils as ut
 
 class storage_metrics:
 
@@ -84,14 +84,14 @@ class storage_metrics:
                 total['QB-cap'] += data[d]['rawcap'] / factor
                 total['QB-com'] += data[d]['rawuse'] / factor
 
-        data = get_scd_last_elt()
+        data = self.get_scd_last_elt()
         for d in data:
             total['EL-cap'] += data[d]['rawcap'] / factor
             total['EL-use'] += data[d]['rawuse'] / factor
 
-        total['tot-cap'] = total['PFS-cap'] + total['QB-cap'] + total['EL-cap']
-        total['tot-com'] = total['PFS-com'] + total['QB-com'] + get_openstack_vms_storage_quota()
-        total['tot-use'] = total['PFS-use'] + total['QB-use'] + total['EL-use'] + get_openstack_vms_storage_used()
+        total['tot-cap'] = total['PFS-cap'] + total['QB-cap'] #+ total['EL-cap']
+        total['tot-com'] = total['PFS-com'] + total['QB-com'] #+ get_openstack_vms_storage_quota()
+        total['tot-use'] = total['PFS-use'] + total['QB-use'] #+ total['EL-use'] + get_openstack_vms_storage_used()
 
         return total
 
