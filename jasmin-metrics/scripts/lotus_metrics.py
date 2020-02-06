@@ -1,7 +1,8 @@
 import scripts.utils as ut
 import requests
 import scipy.integrate as it
-
+import numpy as np
+import re
 
 class lotus_metrics:
 
@@ -79,9 +80,9 @@ class lotus_metrics:
 
         for h in self.hosts:
             # get the in first
-            data = get_host_metrics_report(h, 'network_report')
+            data = self.get_host_metrics_report(h, 'network_report')
             in_report = data[0]
-            dt = calc_dt(in_report)
+            dt = self.calc_dt(in_report)
             in_data = [x[0] for x in in_report['datapoints']]
             in_int = it.simps(in_data, dx=dt)
             if in_report['metric_name'].strip() == 'In':
@@ -94,7 +95,7 @@ class lotus_metrics:
                 raise ValueError('Metric seems to be wrong')
 
             out_report = data[1]
-            dt = calc_dt(out_report)
+            dt = self.calc_dt(out_report)
             out_data = [x[0] for x in out_report['datapoints']]
             out_int = it.simps(out_data, dx=dt)
             if out_report['metric_name'].strip() == 'Out':
@@ -162,7 +163,7 @@ class lotus_metrics:
             data = self.get_host_metrics_report(h, 'load_report', period='month')
             proc_data = data[2]
             cpu_data = data[1]
-            dt = calc_dt(proc_data)
+            dt = self.calc_dt(proc_data)
             proc_data = [x[0] for x in proc_data['datapoints']]
             tot = it.simps(proc_data, dx=dt)
 

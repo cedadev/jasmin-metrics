@@ -1,4 +1,5 @@
 import scripts.utils as ut
+import numpy as np
 
 class mc_metrics:
 
@@ -38,7 +39,6 @@ class mc_metrics:
         return tot/10**3
 
     def get_openstack_vms_cpus_used(self):
-        client = get_influxdb_client()
         q = self.client.query('select VCPUs_Used from Openstack where time > now() - 1h')
         if len(q) == 0:
             q = self.client.query('select VCPUs_Used from Openstack where time > now() - 2h')
