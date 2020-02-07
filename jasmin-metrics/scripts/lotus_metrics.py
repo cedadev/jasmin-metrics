@@ -205,6 +205,26 @@ class LotusMetrics:
         array_count = self.xdmod.get_tsparam('submitted_job_count',start,stop)
         return array_count
 
+    def lotus_expansion_factor(self,start,stop):
+        array_expf = self.xdmod.get_tsparam('expansion_factor',start,stop)
+        return array_expf
+
+    def lotus_wait_dur_avg(self,start,stop):
+        array_wait = self.xdmod.get_tsparam('avg_waitduration_hours',start,stop)
+        return array_wait
+
+    def lotus_wait_dur_tot(self,start,stop):
+        array_wait = self.xdmod.get_tsparam('total_waitduration_hours', start,stop)
+        return array_wait
+
+    def lotus_wall_dur_avg(self,start,stop):
+        array_wall = self.xdmod.get_tsparam('avg_wallduration_hours',start,stop)
+        return array_wall
+
+    def lotus_wall_dur_tot(self,start,stop):
+        array_wall = self.xdmod.get_tsparam('total_wallduration_hours', start,stop)
+        return array_wall
+
     def get_lotus_core_hours_day(self):
         # get the last element from the xdmod extraction from today's data
         data = self.lotus_core_hours(self.yesterday, self.today)['total_cpu_hours']
@@ -421,3 +441,23 @@ class LotusMetrics:
 
     def get_lotus_tbmonth_out(self):
         return self.get_lotus_network_traffic_tbmonth()[1]
+
+    def get_lotus_expansion_factor(self):
+        data = self.lotus_expansion_factor(self.yesterday,self.today)
+        return data.to_numpy()[-1]
+
+    def get_lotus_wait_dur_avg(self):
+        data = self.lotus_wait_dur_avg(self.yesterday,self.today)
+        return data.to_numpy()[-1]
+
+    def get_lotus_wait_dur_tot(self):
+        data = self.lotus_wait_dur_tot(self.yesterday,self.today)
+        return data.to_numpy()[-1]
+
+    def get_lotus_wall_dur_avg(self):
+        data = self.lotus_wall_dur_avg(self.yesterday,self.today)
+        return data.to_numpy()[-1]
+
+    def get_lotus_wall_dur_tot(self):
+        data = self.lotus_wall_dur_tot(self.yesterday,self.today)
+        return data.to_numpy()[-1]
