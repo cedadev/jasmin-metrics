@@ -3,12 +3,21 @@ import requests
 import scipy.integrate as it
 import numpy as np
 import re
+from scripts.xdmod import XdMOD
+import datetime
 
-class lotus_metrics:
+class LotusMetrics:
 
     def __init__(self):
-        self.client = ut.get_influxdb_client('lsfMetrics')
-        self.hosts = self.get_all_lotus_hosts()
+        #self.client = ut.get_influxdb_client('lsfMetrics')
+        #self.hosts = self.get_all_lotus_hosts()
+        self.xdmod = XdMOD()
+        self.today = datetime.datetime.now().strftime('%Y-%m-%d')
+        self.yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+        self.min3day = (datetime.datetime.now() - datetime.timedelta(days=3)).strftime('%Y-%m-%d')
+        self.minweek = (datetime.datetime.now() - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+        self.minmonth = (datetime.datetime.now() - datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+
 
     def get_lotus_host_data(self):
 
@@ -154,36 +163,248 @@ class lotus_metrics:
         return in_sum, out_sum
 
 
-    def calc_lotus_core_hours(self):
-        # calculates the number of cour hours over the previous month
+    def lotus_core_hours(self,start,stop):
 
-        corehours = 0
-        cpus = 0
-        for h in self.hosts:
-            data = self.get_host_metrics_report(h, 'load_report', period='month')
-            proc_data = data[2]
-            cpu_data = data[1]
-            dt = self.calc_dt(proc_data)
-            proc_data = [x[0] for x in proc_data['datapoints']]
-            tot = it.simps(proc_data, dx=dt)
+        array_core_hours = self.xdmod.get_tsparam('total_cpu_hours',start,stop)
+        return array_core_hours
 
-            corehours += tot / 3600
-
-            cpu_data = [x[0] for x in cpu_data['datapoints']]
-            totcpus = it.simps(cpu_data, dx=dt)
-
-            cpus += totcpus / 3600
-        util = corehours / cpus * 100
-
-        return cpus, corehours, util
+    def lotus_core_hours_avg(self,start,stop):
+        array_core_hours = self.xdmod.get_tsparam('avg_cpu_hours', start,stop)
+        return array_core_hours
 
 
-    def get_lotus_core_hours(self):
-        return self.calc_lotus_core_hours()[1]
+    def lotus_util(self,start,stop):
+        array_util = self.xdmod.get_tsparam('utilization', start, stop)
+        return array_util
+
+    def lotus_job_proc_min(self,start,stop):
+        array_procs = self.xdmod.get_tsparam('min_processors',start,stop)
+        return array_procs
+
+    def lotus_job_proc_avg(self,start,stop):
+        array_procs = self.xdmod.get_tsparam('avg_processors',start,stop)
+        return array_procs
+
+    def lotus_job_proc_max(self,start,stop):
+        array_procs = self.xdmod.get_tsparam('max_processors',start,stop)
+        return array_procs
+
+    def lotus_job_count_finished(self,start,stop):
+        array_count = self.xdmod.get_tsparam('job_count',start,stop)
+        return array_count
+
+    def lotus_job_count_started(self,start,stop):
+        array_count = self.xdmod.get_tsparam('started_job_count',start,stop)
+        return array_count
+
+    def lotus_job_count_running(self,start,stop):
+        array_count = self.xdmod.get_tsparam('running_job_count',start,stop)
+        return array_count
+
+    def lotus_job_count_submitted(self,start,stop):
+        array_count = self.xdmod.get_tsparam('submitted_job_count',start,stop)
+        return array_count
+
+    def get_lotus_core_hours_day(self):
+        # get the last element from the xdmod extraction from today's data
+        data = self.lotus_core_hours(self.yesterday, self.today)['total_cpu_hours']
+        return data.sum()
+
+    def get_lotus_core_hours_3day(self):
+        # get the last element from the xdmod extraction from today's data
+        data = self.lotus_core_hours(self.min3day, self.today)['total_cpu_hours']
+        return data.sum()
+
+    def get_lotus_core_hours_week(self):
+        # get the last element from the xdmod extraction from today's data
+        data = self.lotus_core_hours(self.minweek, self.today)['total_cpu_hours']
+        return data.sum()
 
 
-    def get_lotus_util(self):
-        return self.calc_lotus_core_hours()[2]
+    def get_lotus_core_hours_month(self):
+        # get the last element from the xdmod extraction from today's data
+        data = self.lotus_core_hours(self.minmonth, self.today)['total_cpu_hours']
+        return data.sum()
+
+
+    def get_lotus_core_hours_avg_day(self):
+        data = self.lotus_core_hours_avg(self.yesterday, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_core_hours_avg_3day(self):
+        data = self.lotus_core_hours_avg(self.min3day, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_core_hours_avg_week(self):
+        data = self.lotus_core_hours_avg(self.minweek, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_core_hours_avg_month(self):
+        data = self.lotus_core_hours_avg(self.minmonth, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_util_day(self):
+        data = self.lotus_util(self.yesterday, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_util_3day(self):
+        data = self.lotus_util(self.min3day, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_util_week(self):
+        data = self.lotus_util(self.minweek, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_util_month(self):
+        data = self.lotus_util(self.minmonth, self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_job_proc_min_day(self):
+        data = self.lotus_job_proc_min(self.yesterday,self.today)
+        return data.min().to_numpy()[0]
+
+
+    def get_lotus_job_proc_min_3day(self):
+        data = self.lotus_job_proc_min(self.min3day,self.today)
+        return data.min().to_numpy()[0]
+
+
+    def get_lotus_job_proc_min_week(self):
+        data = self.lotus_job_proc_min(self.minweek,self.today)
+        return data.min().to_numpy()[0]
+
+
+    def get_lotus_job_proc_min_month(self):
+        data = self.lotus_job_proc_min(self.minmonth,self.today)
+        return data.min().to_numpy()[0]
+
+
+    def get_lotus_job_proc_avg_day(self):
+        data = self.lotus_job_proc_avg(self.yesterday,self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_job_proc_avg_3day(self):
+        data = self.lotus_job_proc_avg(self.min3day,self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_job_proc_avg_week(self):
+        data = self.lotus_job_proc_avg(self.minweek,self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_job_proc_avg_month(self):
+        data = self.lotus_job_proc_avg(self.minmonth,self.today)
+        return data.mean().to_numpy()[0]
+
+
+    def get_lotus_job_proc_max_day(self):
+        data = self.lotus_job_proc_max(self.yesterday,self.today)
+        return data.max().to_numpy()[0]
+
+
+    def get_lotus_job_proc_max_3day(self):
+        data = self.lotus_job_proc_max(self.min3day,self.today)
+        return data.max().to_numpy()[0]
+
+
+    def get_lotus_job_proc_max_week(self):
+        data = self.lotus_job_proc_max(self.minweek,self.today)
+        return data.max().to_numpy()[0]
+
+
+    def get_lotus_job_proc_max_month(self):
+        data = self.lotus_job_proc_max(self.minmonth,self.today)
+        return data.max().to_numpy()[0]
+
+
+    def get_lotus_job_count_finished_day(self):
+        data = self.lotus_job_count_finished(self.yesterday,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_finished_3day(self):
+        data = self.lotus_job_count_finished(self.min3day,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_finished_week(self):
+        data = self.lotus_job_count_finished(self.minweek,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_finished_month(self):
+        data = self.lotus_job_count_finished(self.minmonth,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_started_day(self):
+        data = self.lotus_job_count_started(self.yesterday,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_started_3day(self):
+        data = self.lotus_job_count_started(self.min3day,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_started_week(self):
+        data = self.lotus_job_count_started(self.minweek,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_started_month(self):
+        data = self.lotus_job_count_started(self.minmonth,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_running_day(self):
+        data = self.lotus_job_count_running(self.yesterday,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_running_3day(self):
+        data = self.lotus_job_count_running(self.min3day,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_running_week(self):
+        data = self.lotus_job_count_running(self.minweek,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_running_month(self):
+        data = self.lotus_job_count_running(self.minmonth,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_submitted_day(self):
+        data = self.lotus_job_count_submitted(self.yesterday,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_submitted_3day(self):
+        data = self.lotus_job_count_submitted(self.min3day,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_submitted_week(self):
+        data = self.lotus_job_count_submitted(self.minweek,self.today)
+        return data.sum().to_numpy()[0]
+
+
+    def get_lotus_job_count_submitted_month(self):
+        data = self.lotus_job_count_submitted(self.minmonth,self.today)
+        return data.sum().to_numpy()[0]
 
 
     def get_lotus_network_in(self):

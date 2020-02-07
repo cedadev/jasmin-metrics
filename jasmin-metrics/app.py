@@ -3,7 +3,7 @@ import prometheus_client as pc
 import influxdb
 import configparser
 from scripts.archive_metrics import archive_metrics
-from scripts.lotus_metrics import lotus_metrics
+from scripts.lotus_metrics import LotusMetrics
 from scripts.managed_cloud_metrics import mc_metrics
 from scripts.unmanaged_cloud_metrics import umc_metrics
 from scripts.network_metrics import network_metrics
@@ -23,7 +23,7 @@ class FlaskPrometheusView:
         '''
         self.service_status_list = service_status_list
         self.req_metrics = req_metrics
-        lotus = lotus_metrics()
+        lotus = LotusMetrics()
         storage = storage_metrics()
         mc = mc_metrics()
 
@@ -45,8 +45,46 @@ class FlaskPrometheusView:
             'lotus_tbmonth_out': lotus.get_lotus_tbmonth_out,
             'lotus_network_in': lotus.get_lotus_network_in,
             'lotus_network_out': lotus.get_lotus_network_out,
-            'lotus_core_hours': lotus.get_lotus_core_hours,
-            'lotus_util': lotus.get_lotus_util,
+            'lotus_core_hours_day': lotus.get_lotus_core_hours_day,
+            'lotus_core_hours_3day': lotus.get_lotus_core_hours_3day,
+            'lotus_core_hours_week': lotus.get_lotus_core_hours_week,
+            'lotus_core_hours_month': lotus.get_lotus_core_hours_month,
+            'lotus_core_hours_avg_day': lotus.get_lotus_core_hours_avg_day,
+            'lotus_core_hours_avg_3day': lotus.get_lotus_core_hours_avg_3day,
+            'lotus_core_hours_avg_week': lotus.get_lotus_core_hours_avg_week,
+            'lotus_core_hours_avg_month': lotus.get_lotus_core_hours_avg_month,
+            'lotus_util_day': lotus.get_lotus_util_day,
+            'lotus_util_3day': lotus.get_lotus_util_3day,
+            'lotus_util_week': lotus.get_lotus_util_week,
+            'lotus_util_month': lotus.get_lotus_util_month,
+            'lotus_job_proc_min_day': lotus.get_lotus_job_proc_min_day,
+            'lotus_job_proc_min_3day': lotus.get_lotus_job_proc_min_3day,
+            'lotus_job_proc_min_week': lotus.get_lotus_job_proc_min_week,
+            'lotus_job_proc_min_month': lotus.get_lotus_job_proc_min_month,
+            'lotus_job_proc_avg_day': lotus.get_lotus_job_proc_avg_day,
+            'lotus_job_proc_avg_3day': lotus.get_lotus_job_proc_avg_3day,
+            'lotus_job_proc_avg_week': lotus.get_lotus_job_proc_avg_week,
+            'lotus_job_proc_avg_month': lotus.get_lotus_job_proc_avg_month,
+            'lotus_job_proc_max_day': lotus.get_lotus_job_proc_max_day,
+            'lotus_job_proc_max_3day': lotus.get_lotus_job_proc_max_3day,
+            'lotus_job_proc_max_week': lotus.get_lotus_job_proc_max_week,
+            'lotus_job_proc_max_month': lotus.get_lotus_job_proc_max_month,
+            'lotus_job_count_finished_day': lotus.get_lotus_job_count_finished_day,
+            'lotus_job_count_finished_3day': lotus.get_lotus_job_count_finished_3day,
+            'lotus_job_count_finished_week': lotus.get_lotus_job_count_finished_week,
+            'lotus_job_count_finished_month': lotus.get_lotus_job_count_finished_month,
+            'lotus_job_count_started_day': lotus.get_lotus_job_count_started_day,
+            'lotus_job_count_started_3day': lotus.get_lotus_job_count_started_3day,
+            'lotus_job_count_started_week': lotus.get_lotus_job_count_started_week,
+            'lotus_job_count_started_month': lotus.get_lotus_job_count_started_month,
+            'lotus_job_count_submitted_day': lotus.get_lotus_job_count_submitted_day,
+            'lotus_job_count_submitted_3day': lotus.get_lotus_job_count_submitted_3day,
+            'lotus_job_count_submitted_week': lotus.get_lotus_job_count_submitted_week,
+            'lotus_job_count_submitted_month': lotus.get_lotus_job_count_submitted_month,
+            'lotus_job_count_running_day': lotus.get_lotus_job_count_running_day,
+            'lotus_job_count_running_3day': lotus.get_lotus_job_count_running_3day,
+            'lotus_job_count_running_week': lotus.get_lotus_job_count_running_week,
+            'lotus_job_count_running_month': lotus.get_lotus_job_count_running_month,
             'openstack_vms_count': mc.get_openstack_vms_count,
             'openstack_vms_cpus_quota': mc.get_openstack_vms_cpus_quota,
             'openstack_vms_cpus_used': mc.get_openstack_vms_cpus_used,

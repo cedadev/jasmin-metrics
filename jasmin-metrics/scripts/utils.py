@@ -1,6 +1,13 @@
 from influxdb import InfluxDBClient
+import os
 
-def get_creds(loc='/root/creds.ini'):
+def get_creds(loc='environ'):
+    if loc == 'environ':
+        try:
+            loc = os.environ['JASMIN_METRICS_CRED_LOC']
+        except Exception as e:
+            loc = '/root/creds.ini'
+
     creds = {'sever' : '',
              'port' : '',
              'uname' : '',
