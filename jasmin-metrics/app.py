@@ -141,6 +141,18 @@ def flask_app_factory():
     path = '/metrics/'
     app.add_url_rule(path, 'metrics', flask_view)
 
+    arch_req_metrics = ['storage_total',
+                        'storage_used',
+                        'storage_com']
+    arch_service_status_list = {}
+    # gauges
+    for m in arch_req_metrics['gauge']:
+        gauge = pc.Gauge(m, m)
+        arch_service_status_list[m] = (gauge)
+
+    arch_flask_view = FlaskPrometheusView(service_status_list,
+                                    req_metrics)
+
     return app
 
 
