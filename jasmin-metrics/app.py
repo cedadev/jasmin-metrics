@@ -2,15 +2,15 @@ from flask import Flask, Response
 import prometheus_client as pc
 import influxdb
 import configparser
-from scripts.archive_metrics import archive_metrics
+from scripts.archive_metrics import ArchiveMetrics
 from scripts.lotus_metrics import LotusMetrics
-from scripts.managed_cloud_metrics import mc_metrics
-from scripts.unmanaged_cloud_metrics import umc_metrics
-from scripts.network_metrics import network_metrics
-from scripts.storage_metrics import storage_metrics
-from scripts.tape_metrics import tape_metrics
-from scripts.users_metrics import users_metrics
-from scripts.power_metrics import power_metrics
+from scripts.managed_cloud_metrics import MCMetrics
+from scripts.unmanaged_cloud_metrics import UMCMetrics
+from scripts.network_metrics import NetworkMetrics
+from scripts.storage_metrics import StorageMetrics
+from scripts.tape_metrics import TapeMetrics
+from scripts.users_metrics import UsersMetrics
+from scripts.power_metrics import PowerMetrics
 
 
 class FlaskPrometheusView:
@@ -24,7 +24,7 @@ class FlaskPrometheusView:
         self.service_status_list = service_status_list
         self.req_metrics = req_metrics
         lotus = LotusMetrics()
-        storage = storage_metrics()
+        storage = StorageMetrics()
         mc = mc_metrics()
 
         # define dictionary of calculation functions

@@ -1,5 +1,5 @@
 
 
-class network_metrics:
+class NetworkMetrics:
     def __init__(self):
         pass

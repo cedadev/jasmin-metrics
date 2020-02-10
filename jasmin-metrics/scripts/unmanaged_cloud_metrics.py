@@ -1,5 +1,5 @@
 
 
-class umc_metrics:
+class UMCMetrics:
     def __init__(self):
         pass

@@ -1,6 +1,6 @@
 import scripts.utils as ut
 
-class storage_metrics:
+class StorageMetrics:
 
     def __init__(self):
         self.client = ut.get_influxdb_client()

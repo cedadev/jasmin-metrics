@@ -1,7 +1,7 @@
 import scripts.utils as ut
 import numpy as np
 
-class mc_metrics:
+class MCMetrics:
 
     def __init__(self):
 

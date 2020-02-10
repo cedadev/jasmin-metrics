@@ -1,5 +1,5 @@
 
 
-class tape_metrics:
+class TapeMetrics:
     def __init__(self):
         pass

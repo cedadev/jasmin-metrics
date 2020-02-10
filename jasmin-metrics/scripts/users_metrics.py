@@ -1,5 +1,5 @@
 
 
-class users_metrics:
+class UsersMetrics:
     def __init__(self):
         pass

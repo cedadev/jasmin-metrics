@@ -1,5 +1,5 @@
 
 
-class power_metrics:
+class PowerMetrics:
     def __init__(self):
         pass

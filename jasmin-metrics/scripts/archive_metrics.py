@@ -1,5 +1,5 @@
 
 
-class archive_metrics:
+class ArchiveMetrics:
     def __init__(self):
         pass
