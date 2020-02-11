@@ -27,6 +27,7 @@ class FlaskPrometheusView:
         lotus = LotusMetrics()
         storage = StorageMetrics()
         mc = MCMetrics()
+        arch = ArchiveMetrics()
 
         # define dictionary of calculation functions
         self.met_funcs = {
@@ -98,6 +99,7 @@ class FlaskPrometheusView:
             'openstack_vms_ram_used': mc.get_openstack_vms_ram_used,
             'openstack_vms_storage_quota': mc.get_openstack_vms_storage_quota,
             'openstack_vms_storage_used': mc.get_openstack_vms_storage_used,
+            'archive_ingest1_load_1min': arch.get_archive_ingest1_load_1min,
        }
 
 
@@ -147,7 +149,8 @@ def flask_app_factory():
     arch_collector = pc.CollectorRegistry()
     arch_req_metrics = {'gauge': ['storage_total',
                         'storage_used',
-                        'storage_com']}
+                        'storage_com',
+                        'archive_ingest1_load_1min']}
     arch_service_status_list = {}
     # gauges
     for m in arch_req_metrics['gauge']:

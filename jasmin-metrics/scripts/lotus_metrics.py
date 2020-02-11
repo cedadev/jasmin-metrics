@@ -9,8 +9,8 @@ import datetime
 class LotusMetrics:
 
     def __init__(self):
-        self.client = ut.get_influxdb_client('lsfMetrics')
-        self.hosts = self.get_all_lotus_hosts()
+        #self.client = ut.get_influxdb_client('lsfMetrics')
+        #self.hosts = self.get_all_lotus_hosts()
         self.xdmod = XdMOD()
         self.today = datetime.datetime.now().strftime('%Y-%m-%d')
         self.yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
@@ -56,15 +56,6 @@ class LotusMetrics:
         return mem
 
 
-    def get_host_metrics_report(self, host, metric, period='2month'):
-        """ Get a json document which is the ganglia report"""
-
-        url = "http://mgmt.jc.rl.ac.uk/ganglia/graph.php?r={}&h={}&m=load_one&s=by+name&mc=2&g={}&c=JASMIN+Cluster&json=1".format(
-            period, host, metric)
-        r = requests.get(url)
-        raw_json = r.json()
-
-        return raw_json
 
 
     def get_all_lotus_hosts(self):
@@ -89,7 +80,7 @@ class LotusMetrics:
 
         for h in self.hosts:
             # get the in first
-            data = self.get_host_metrics_report(h, 'network_report')
+            data = ut.get_host_metrics_report(h, 'network_report')
             in_report = data[0]
             dt = self.calc_dt(in_report)
             in_data = [x[0] for x in in_report['datapoints']]
@@ -132,7 +123,7 @@ class LotusMetrics:
 
         for h in self.hosts:
             # get the in first
-            data = self.get_host_metrics_report(h, 'network_report', period='hour')
+            data = ut.get_host_metrics_report(h, 'network_report', period='hour')
             in_report = data[0]
             in_val = np.sum([x[0] for x in in_report['datapoints']][-5:]) / (5)
             if in_report['metric_name'].strip() == 'In':

@@ -29,4 +29,12 @@ def get_influxdb_client(db='Metrics'):
                             db)
     return client
 
+def get_host_metrics_report(self, host, metric, period='2month'):
+    """ Get a json document which is the ganglia report"""
 
+    url = "http://mgmt.jc.rl.ac.uk/ganglia/graph.php?r={}&h={}&m=load_one&s=by+name&mc=2&g={}&c=JASMIN+Cluster&json=1".format(
+        period, host, metric)
+    r = requests.get(url)
+    raw_json = r.json()
+
+    return raw_json
