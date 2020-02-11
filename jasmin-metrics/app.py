@@ -18,9 +18,10 @@ class FlaskPrometheusView:
     in order to maintain state information.
     '''
 
-    def __init__(self, service_status_list, req_metrics):
+    def __init__(self, service_status_list, req_metrics, collector):
         '''Initialise, and take list of prometheus metrics
         '''
+        self.collector = collector
         self.service_status_list = service_status_list
         self.req_metrics = req_metrics
         lotus = LotusMetrics()
@@ -109,7 +110,7 @@ class FlaskPrometheusView:
         for m in self.req_metrics['gauge']:
             self.service_status_list[m].set(self.met_funcs[m]())
 
-        return Response(pc.generate_latest(),
+        return Response(pc.generate_latest(registry=self.collector),
                         mimetype='text/plain; charset=utf-8')
 
 
@@ -136,7 +137,8 @@ def flask_app_factory():
         service_status_list[m] = (gauge)
 
     flask_view = FlaskPrometheusView(service_status_list, 
-                                    req_metrics)
+                                    req_metrics,
+                                    collector)
 
     path = '/metrics/'
     app.add_url_rule(path, 'metrics', flask_view)
@@ -153,7 +155,8 @@ def flask_app_factory():
         arch_service_status_list[m] = (gauge)
 
     arch_flask_view = FlaskPrometheusView(arch_service_status_list,
-                                    arch_req_metrics)
+                                    arch_req_metrics,
+                                    arch_collector)
 
     arch_path = '/arch_metrics/'
     app.add_url_rule(arch_path, 'arch_metrics', arch_flask_view)
