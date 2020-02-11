@@ -25,7 +25,7 @@ class FlaskPrometheusView:
         self.req_metrics = req_metrics
         lotus = LotusMetrics()
         storage = StorageMetrics()
-        mc = mc_metrics()
+        mc = MCMetrics()
 
         # define dictionary of calculation functions
         self.met_funcs = {
@@ -132,7 +132,7 @@ def flask_app_factory():
     service_status_list = {}
     # gauges
     for m in req_metrics['gauge']:
-        gauge = pc.Gauge(m, m)
+        gauge = pc.Gauge(m, m, registry=collector)
         service_status_list[m] = (gauge)
 
     flask_view = FlaskPrometheusView(service_status_list, 
@@ -140,18 +140,24 @@ def flask_app_factory():
 
     path = '/metrics/'
     app.add_url_rule(path, 'metrics', flask_view)
+ 
 
-    arch_req_metrics = ['storage_total',
+    arch_collector = pc.CollectorRegistry()
+    arch_req_metrics = {'gauge': ['storage_total',
                         'storage_used',
-                        'storage_com']
+                        'storage_com']}
     arch_service_status_list = {}
     # gauges
     for m in arch_req_metrics['gauge']:
-        gauge = pc.Gauge(m, m)
+        gauge = pc.Gauge(m, m, registry=arch_collector)
         arch_service_status_list[m] = (gauge)
 
-    arch_flask_view = FlaskPrometheusView(service_status_list,
-                                    req_metrics)
+    arch_flask_view = FlaskPrometheusView(arch_service_status_list,
+                                    arch_req_metrics)
+
+    arch_path = '/arch_metrics/'
+    app.add_url_rule(arch_path, 'arch_metrics', arch_flask_view)
+
 
     return app
 
