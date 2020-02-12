@@ -100,7 +100,39 @@ class FlaskPrometheusView:
             'openstack_vms_storage_quota': mc.get_openstack_vms_storage_quota,
             'openstack_vms_storage_used': mc.get_openstack_vms_storage_used,
             'archive_ingest1_load_1min': arch.get_archive_ingest1_load_1min,
-       }
+            'archive_ingest1_mem_swap': arch.get_archive_ingest1_mem_swap,
+            'archive_ingest2_load_1min': arch.get_archive_ingest2_load_1min,
+            'archive_ingest2_mem_swap': arch.get_archive_ingest2_mem_swap,
+            'archive_ingest3_load_1min': arch.get_archive_ingest3_load_1min,
+            'archive_ingest3_mem_swap': arch.get_archive_ingest3_mem_swap,
+            'archive_ingest4_load_1min': arch.get_archive_ingest4_load_1min,
+            'archive_ingest4_mem_swap': arch.get_archive_ingest4_mem_swap,
+            'archive_ingest5_load_1min': arch.get_archive_ingest5_load_1min,
+            'archive_ingest5_mem_swap': arch.get_archive_ingest5_mem_swap,
+            'archive_rbq_load_1min': arch.get_archive_rbq_load_1min,
+            'archive_rbq_mem_swap': arch.get_archive_rbq_mem_swap,
+            'archive_deposit1_load_1min': arch.get_archive_deposit1_load_1min,
+            'archive_deposit1_mem_swap': arch.get_archive_deposit1_mem_swap,
+            'archive_deposit2_load_1min': arch.get_archive_deposit2_load_1min,
+            'archive_deposit2_mem_swap': arch.get_archive_deposit2_mem_swap,
+            'archive_deposit3_load_1min': arch.get_archive_deposit3_load_1min,
+            'archive_deposit3_mem_swap': arch.get_archive_deposit3_mem_swap,
+            'archive_deposit4_load_1min': arch.get_archive_deposit4_load_1min,
+            'archive_deposit4_mem_swap': arch.get_archive_deposit4_mem_swap,
+            'archive_deposit5_load_1min': arch.get_archive_deposit5_load_1min,
+            'archive_deposit5_mem_swap': arch.get_archive_deposit5_mem_swap,
+            'archive_ingest1_up': arch.get_archive_ingest1_up,
+            'archive_ingest2_up': arch.get_archive_ingest2_up,
+            'archive_ingest3_up': arch.get_archive_ingest3_up,
+            'archive_ingest4_up': arch.get_archive_ingest4_up,
+            'archive_ingest5_up': arch.get_archive_ingest5_up,
+            'archive_rbq_up': arch.get_archive_rbq_up,
+            'archive_deposit1_up': arch.get_archive_deposit1_up,
+            'archive_deposit2_up': arch.get_archive_deposit2_up,
+            'archive_deposit3_up': arch.get_archive_deposit3_up,
+            'archive_deposit4_up': arch.get_archive_deposit4_up,
+            'archive_deposit5_up': arch.get_archive_deposit5_up,
+}
 
 
     def __call__(self):
@@ -147,10 +179,7 @@ def flask_app_factory():
  
 
     arch_collector = pc.CollectorRegistry()
-    arch_req_metrics = {'gauge': ['storage_total',
-                        'storage_used',
-                        'storage_com',
-                        'archive_ingest1_load_1min']}
+    arch_req_metrics = parse_metrics_config(fname='./arch_metrics.ini')
     arch_service_status_list = {}
     # gauges
     for m in arch_req_metrics['gauge']:

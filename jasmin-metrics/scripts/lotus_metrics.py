@@ -9,8 +9,8 @@ import datetime
 class LotusMetrics:
 
     def __init__(self):
-        #self.client = ut.get_influxdb_client('lsfMetrics')
-        #self.hosts = self.get_all_lotus_hosts()
+        self.client = ut.get_influxdb_client('lsfMetrics')
+        self.hosts = self.get_all_lotus_hosts()
         self.xdmod = XdMOD()
         self.today = datetime.datetime.now().strftime('%Y-%m-%d')
         self.yesterday = (datetime.datetime.now() - datetime.timedelta(days=1)).strftime('%Y-%m-%d')

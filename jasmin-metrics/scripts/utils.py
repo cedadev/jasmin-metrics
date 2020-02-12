@@ -1,5 +1,5 @@
 from influxdb import InfluxDBClient
-import os
+import os, requests
 
 def get_creds(loc='environ'):
     if loc == 'environ':
@@ -29,7 +29,7 @@ def get_influxdb_client(db='Metrics'):
                             db)
     return client
 
-def get_host_metrics_report(self, host, metric, period='2month'):
+def get_host_metrics_report(host, metric, period='2month'):
     """ Get a json document which is the ganglia report"""
 
     url = "http://mgmt.jc.rl.ac.uk/ganglia/graph.php?r={}&h={}&m=load_one&s=by+name&mc=2&g={}&c=JASMIN+Cluster&json=1".format(
