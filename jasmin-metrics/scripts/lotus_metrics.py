@@ -239,182 +239,182 @@ class LotusMetrics:
 
 
     def get_lotus_core_hours_avg_day(self):
-        data = self.lotus_core_hours_avg(self.yesterday, self.today)
+        data = self.lotus_core_hours_avg(self.yesterday, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_core_hours_avg_3day(self):
-        data = self.lotus_core_hours_avg(self.min3day, self.today)
+        data = self.lotus_core_hours_avg(self.min3day, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_core_hours_avg_week(self):
-        data = self.lotus_core_hours_avg(self.minweek, self.today)
+        data = self.lotus_core_hours_avg(self.minweek, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_core_hours_avg_month(self):
-        data = self.lotus_core_hours_avg(self.minmonth, self.today)
+        data = self.lotus_core_hours_avg(self.minmonth, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_util_day(self):
-        data = self.lotus_util(self.yesterday, self.today)
+        data = self.lotus_util(self.yesterday, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_util_3day(self):
-        data = self.lotus_util(self.min3day, self.today)
+        data = self.lotus_util(self.min3day, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_util_week(self):
-        data = self.lotus_util(self.minweek, self.today)
+        data = self.lotus_util(self.minweek, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_util_month(self):
-        data = self.lotus_util(self.minmonth, self.today)
+        data = self.lotus_util(self.minmonth, self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_job_proc_min_day(self):
-        data = self.lotus_job_proc_min(self.yesterday,self.today)
+        data = self.lotus_job_proc_min(self.yesterday,self.yesterday)
         return data.min().to_numpy()[0]
 
 
     def get_lotus_job_proc_min_3day(self):
-        data = self.lotus_job_proc_min(self.min3day,self.today)
+        data = self.lotus_job_proc_min(self.min3day,self.yesterday)
         return data.min().to_numpy()[0]
 
 
     def get_lotus_job_proc_min_week(self):
-        data = self.lotus_job_proc_min(self.minweek,self.today)
+        data = self.lotus_job_proc_min(self.minweek,self.yesterday)
         return data.min().to_numpy()[0]
 
 
     def get_lotus_job_proc_min_month(self):
-        data = self.lotus_job_proc_min(self.minmonth,self.today)
+        data = self.lotus_job_proc_min(self.minmonth,self.yesterday)
         return data.min().to_numpy()[0]
 
 
     def get_lotus_job_proc_avg_day(self):
-        data = self.lotus_job_proc_avg(self.yesterday,self.today)
+        data = self.lotus_job_proc_avg(self.yesterday,self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_job_proc_avg_3day(self):
-        data = self.lotus_job_proc_avg(self.min3day,self.today)
+        data = self.lotus_job_proc_avg(self.min3day,self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_job_proc_avg_week(self):
-        data = self.lotus_job_proc_avg(self.minweek,self.today)
+        data = self.lotus_job_proc_avg(self.minweek,self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_job_proc_avg_month(self):
-        data = self.lotus_job_proc_avg(self.minmonth,self.today)
+        data = self.lotus_job_proc_avg(self.minmonth,self.yesterday)
         return data.mean().to_numpy()[0]
 
 
     def get_lotus_job_proc_max_day(self):
-        data = self.lotus_job_proc_max(self.yesterday,self.today)
+        data = self.lotus_job_proc_max(self.yesterday,self.yesterday)
         return data.max().to_numpy()[0]
 
 
     def get_lotus_job_proc_max_3day(self):
-        data = self.lotus_job_proc_max(self.min3day,self.today)
+        data = self.lotus_job_proc_max(self.min3day,self.yesterday)
         return data.max().to_numpy()[0]
 
 
     def get_lotus_job_proc_max_week(self):
-        data = self.lotus_job_proc_max(self.minweek,self.today)
+        data = self.lotus_job_proc_max(self.minweek,self.yesterday)
         return data.max().to_numpy()[0]
 
 
     def get_lotus_job_proc_max_month(self):
-        data = self.lotus_job_proc_max(self.minmonth,self.today)
+        data = self.lotus_job_proc_max(self.minmonth,self.yesterday)
         return data.max().to_numpy()[0]
 
 
     def get_lotus_job_count_finished_day(self):
-        data = self.lotus_job_count_finished(self.yesterday,self.today)
+        data = self.lotus_job_count_finished(self.yesterday,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_finished_3day(self):
-        data = self.lotus_job_count_finished(self.min3day,self.today)
+        data = self.lotus_job_count_finished(self.min3day,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_finished_week(self):
-        data = self.lotus_job_count_finished(self.minweek,self.today)
+        data = self.lotus_job_count_finished(self.minweek,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_finished_month(self):
-        data = self.lotus_job_count_finished(self.minmonth,self.today)
+        data = self.lotus_job_count_finished(self.minmonth,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_started_day(self):
-        data = self.lotus_job_count_started(self.yesterday,self.today)
+        data = self.lotus_job_count_started(self.yesterday,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_started_3day(self):
-        data = self.lotus_job_count_started(self.min3day,self.today)
+        data = self.lotus_job_count_started(self.min3day,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_started_week(self):
-        data = self.lotus_job_count_started(self.minweek,self.today)
+        data = self.lotus_job_count_started(self.minweek,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_started_month(self):
-        data = self.lotus_job_count_started(self.minmonth,self.today)
+        data = self.lotus_job_count_started(self.minmonth,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_running_day(self):
-        data = self.lotus_job_count_running(self.yesterday,self.today)
+        data = self.lotus_job_count_running(self.yesterday,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_running_3day(self):
-        data = self.lotus_job_count_running(self.min3day,self.today)
+        data = self.lotus_job_count_running(self.min3day,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_running_week(self):
-        data = self.lotus_job_count_running(self.minweek,self.today)
+        data = self.lotus_job_count_running(self.minweek,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_running_month(self):
-        data = self.lotus_job_count_running(self.minmonth,self.today)
+        data = self.lotus_job_count_running(self.minmonth,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_submitted_day(self):
-        data = self.lotus_job_count_submitted(self.yesterday,self.today)
+        data = self.lotus_job_count_submitted(self.yesterday,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_submitted_3day(self):
-        data = self.lotus_job_count_submitted(self.min3day,self.today)
+        data = self.lotus_job_count_submitted(self.min3day,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_submitted_week(self):
-        data = self.lotus_job_count_submitted(self.minweek,self.today)
+        data = self.lotus_job_count_submitted(self.minweek,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
     def get_lotus_job_count_submitted_month(self):
-        data = self.lotus_job_count_submitted(self.minmonth,self.today)
+        data = self.lotus_job_count_submitted(self.minmonth,self.yesterday)
         return data.sum().to_numpy()[0]
 
 
@@ -434,21 +434,26 @@ class LotusMetrics:
         return self.get_lotus_network_traffic_tbmonth()[1]
 
     def get_lotus_expansion_factor(self):
-        data = self.lotus_expansion_factor(self.yesterday,self.today)
+        data = self.lotus_expansion_factor(self.yesterday,self.yesterday)
         return data.to_numpy()[-1]
 
     def get_lotus_wait_dur_avg(self):
-        data = self.lotus_wait_dur_avg(self.yesterday,self.today)
+        data = self.lotus_wait_dur_avg(self.yesterday,self.yesterday)
         return data.to_numpy()[-1]
 
     def get_lotus_wait_dur_tot(self):
-        data = self.lotus_wait_dur_tot(self.yesterday,self.today)
+        data = self.lotus_wait_dur_tot(self.yesterday,self.yesterday)
         return data.to_numpy()[-1]
 
     def get_lotus_wall_dur_avg(self):
-        data = self.lotus_wall_dur_avg(self.yesterday,self.today)
+        data = self.lotus_wall_dur_avg(self.yesterday,self.yesterday)
         return data.to_numpy()[-1]
 
     def get_lotus_wall_dur_tot(self):
-        data = self.lotus_wall_dur_tot(self.yesterday,self.today)
+        data = self.lotus_wall_dur_tot(self.yesterday,self.yesterday)
         return data.to_numpy()[-1]
+
+if __name__ == "__main__":
+    lm = LotusMetrics()
+    print(lm.get_lotus_jobs_started_today())
+ 
