@@ -1,11 +1,11 @@
-import scripts.utils as ut
+from .utils import *
 import numpy as np
 
 class MCMetrics:
 
     def __init__(self):
 
-        self.client = ut.get_influxdb_client()
+        self.client = get_influxdb_client()
 
     def get_openstack_vms_count(self):
 

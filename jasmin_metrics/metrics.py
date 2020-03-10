@@ -1,38 +1,31 @@
-from flask import Flask, Response
 import prometheus_client as pc
 import influxdb
 import configparser
-from scripts.archive_metrics import ArchiveMetrics
-from scripts.lotus_metrics import LotusMetrics
-from scripts.managed_cloud_metrics import MCMetrics
-from scripts.unmanaged_cloud_metrics import UMCMetrics
-from scripts.network_metrics import NetworkMetrics
-from scripts.storage_metrics import StorageMetrics
-from scripts.tape_metrics import TapeMetrics
-from scripts.users_metrics import UsersMetrics
-from scripts.power_metrics import PowerMetrics
+from .scripts.archive_metrics import ArchiveMetrics
+from .scripts.lotus_metrics import LotusMetrics
+from .scripts.managed_cloud_metrics import MCMetrics
+from .scripts.unmanaged_cloud_metrics import UMCMetrics
+from .scripts.network_metrics import NetworkMetrics
+from .scripts.storage_metrics import StorageMetrics
+from .scripts.tape_metrics import TapeMetrics
+from .scripts.users_metrics import UsersMetrics
+from .scripts.power_metrics import PowerMetrics
 import time
 
-from flask.logging import default_handler
 
-default_handler.formatter.converter = time.gmtime
+        
 
-class FlaskPrometheusView:
-    '''Make a view for each test to be executed.  Express this view as a class
-    in order to maintain state information.
-    '''
-
-    def __init__(self, service_status_list, req_metrics, collector):
+class metrics_app():
+    def __init__(self, req_metrics_file):
         '''Initialise, and take list of prometheus metrics
         '''
-        self.collector = collector
-        self.service_status_list = service_status_list
-        self.req_metrics = req_metrics
         lotus = LotusMetrics()
         storage = StorageMetrics()
         mc = MCMetrics()
         arch = ArchiveMetrics()
         users = UsersMetrics()
+
+        self.req_metrics = self.parse_metrics_config(req_metrics_file)
 
         # define dictionary of calculation functions
         self.met_funcs = {
@@ -145,25 +138,6 @@ class FlaskPrometheusView:
 }
 
 
-    def __call__(self):
-        '''Use call method to make instances of this class a callable
-        function to which a Flask view can be attached
-        '''
-
-
-        for m in self.req_metrics['gauge']:
-            self.service_status_list[m].set(self.met_funcs[m]())
-
-        return Response(pc.generate_latest(registry=self.collector),
-                        mimetype='text/plain; charset=utf-8')
-
-
-
-
-
-class metrics_app():
-    def __init__(self):
-        self.app = Flask(__name__)
 
     def parse_metrics_config(self, fname='./metrics.ini'):
         req_metrics = {}
@@ -173,31 +147,37 @@ class metrics_app():
 
         return req_metrics
 
-    def create_view(self, config, path, name):
+    def gen_metrics(self):
         collector = pc.CollectorRegistry()
-        req_metrics = self.parse_metrics_config(config)
         service_status_list = {}
         # gauges
-        for m in req_metrics['gauge']:
+        for m in self.req_metrics['gauge']:
             gauge = pc.Gauge(m, m, registry=collector)
             service_status_list[m] = (gauge)
 
-        flask_view = FlaskPrometheusView(service_status_list, 
-                                    req_metrics,
-                                    collector)
-        self.app.add_url_rule(path, name, flask_view)
+        return service_status_list
 
-    def create_all_views(self):
-        self.create_view('./metrics.ini', '/metrics/', 'metrics')
-        self.create_view('./daily_metrics.ini','/daily_metrics/','daily metrics')
-        self.create_view('./weekly_metrics.ini','/weekly_metrics/','weekly metrics')
-        self.create_view('./monthly_metrics.ini','/monthly_metrics/','monthly metrics')
-        self.create_view('./arch_metrics.ini','/arch_metrics/','archive metrics')
+    def create_view(self):
+        service_status_list = gen_metrics()
 
-    def run_server(self):
-        self.create_all_views()
-        self.app.run('0.0.0.0', '8091')
+        for m in self.req_metrics['gauge']:
+            service_status_list[m].set(self.met_funcs[m]())
 
-if __name__ == '__main__':
-    app = metrics_app()
-    app.run_server()
+        return pc.generate_latest(registry=self.collector)
+
+
+    def create_metrics_view(self):
+        return self.create_view('./metrics.ini', '/metrics/', 'metrics')
+    
+    def create_daily_metrics_view(self):
+        return self.create_view('./daily_metrics.ini','/daily_metrics/','daily metrics')
+
+    def create_weekly_metrics_view(self):
+        return self.create_view('./weekly_metrics.ini','/weekly_metrics/','weekly metrics')
+
+    def create_monthly_metrics_view(self):
+        return self.create_view('./monthly_metrics.ini','/monthly_metrics/','monthly metrics')
+
+    def create_arch_metrics_view(self):
+        return self.create_view('./arch_metrics.ini','/arch_metrics/','archive metrics')
+
