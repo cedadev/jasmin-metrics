@@ -145,5 +145,6 @@ total_wallduration_hours
 
     met = sys.argv[1]
     xd = XdMOD()
-    data = xd._get_raw(statistic=met,start_date='2019-12-01')
+    #data = xd._get_raw(statistic=met,start_date='2019-12-01')
+    data = xd.get_tsparam(met, start_date="2020-03-03", end_date="2020-03-03")
     pprint(data)

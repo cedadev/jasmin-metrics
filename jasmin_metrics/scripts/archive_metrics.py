@@ -24,7 +24,7 @@ class ArchiveMetrics:
         return last
 
     def host_up(self, host):
-        ping = subprocess.call(['ping', '-c', '1', host]) == 0
+        ping = subprocess.call(['ping', '-q', '-c', '1', host]) == 0
 
         if ping:
             ret_val = 1

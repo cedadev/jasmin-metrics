@@ -11,7 +11,11 @@ from scripts.storage_metrics import StorageMetrics
 from scripts.tape_metrics import TapeMetrics
 from scripts.users_metrics import UsersMetrics
 from scripts.power_metrics import PowerMetrics
+import time
 
+from flask.logging import default_handler
+
+default_handler.formatter.converter = time.gmtime
 
 class FlaskPrometheusView:
     '''Make a view for each test to be executed.  Express this view as a class
@@ -28,6 +32,7 @@ class FlaskPrometheusView:
         storage = StorageMetrics()
         mc = MCMetrics()
         arch = ArchiveMetrics()
+        users = UsersMetrics()
 
         # define dictionary of calculation functions
         self.met_funcs = {
@@ -132,6 +137,11 @@ class FlaskPrometheusView:
             'archive_deposit3_up': arch.get_archive_deposit3_up,
             'archive_deposit4_up': arch.get_archive_deposit4_up,
             'archive_deposit5_up': arch.get_archive_deposit5_up,
+            'users_jasmin': users.get_users_jasmin,
+            'users_jasmin_login_active_today': users.get_users_jasmin_login_active_today,
+            'users_jasmin_login_new_today': users.get_users_jasmin_login_new_today,
+            'users_jasmin_login_new_week': users.get_users_jasmin_login_new_week,
+            'users_jasmin_login_new_quarter': users.get_users_jasmin_login_new_quarter,
 }
 
 
@@ -150,54 +160,44 @@ class FlaskPrometheusView:
 
 
 
-def parse_metrics_config(fname='./metrics.ini'):
-    req_metrics = {}
-    config = configparser.ConfigParser()
-    config.read(fname)
-    req_metrics['gauge'] = config.get('Metrics','gauge').split('\n')
 
-    return req_metrics
+class metrics_app():
+    def __init__(self):
+        self.app = Flask(__name__)
 
-def flask_app_factory():
+    def parse_metrics_config(self, fname='./metrics.ini'):
+        req_metrics = {}
+        config = configparser.ConfigParser()
+        config.read(fname)
+        req_metrics['gauge'] = config.get('Metrics','gauge').split('\n')
 
-    app = Flask(__name__)
-    collector = pc.CollectorRegistry()
+        return req_metrics
 
-    req_metrics = parse_metrics_config()
-    service_status_list = {}
-    # gauges
-    for m in req_metrics['gauge']:
-        gauge = pc.Gauge(m, m, registry=collector)
-        service_status_list[m] = (gauge)
+    def create_view(self, config, path, name):
+        collector = pc.CollectorRegistry()
+        req_metrics = self.parse_metrics_config(config)
+        service_status_list = {}
+        # gauges
+        for m in req_metrics['gauge']:
+            gauge = pc.Gauge(m, m, registry=collector)
+            service_status_list[m] = (gauge)
 
-    flask_view = FlaskPrometheusView(service_status_list, 
+        flask_view = FlaskPrometheusView(service_status_list, 
                                     req_metrics,
                                     collector)
+        self.app.add_url_rule(path, name, flask_view)
 
-    path = '/metrics/'
-    app.add_url_rule(path, 'metrics', flask_view)
- 
+    def create_all_views(self):
+        self.create_view('./metrics.ini', '/metrics/', 'metrics')
+        self.create_view('./daily_metrics.ini','/daily_metrics/','daily metrics')
+        self.create_view('./weekly_metrics.ini','/weekly_metrics/','weekly metrics')
+        self.create_view('./monthly_metrics.ini','/monthly_metrics/','monthly metrics')
+        self.create_view('./arch_metrics.ini','/arch_metrics/','archive metrics')
 
-    arch_collector = pc.CollectorRegistry()
-    arch_req_metrics = parse_metrics_config(fname='./arch_metrics.ini')
-    arch_service_status_list = {}
-    # gauges
-    for m in arch_req_metrics['gauge']:
-        gauge = pc.Gauge(m, m, registry=arch_collector)
-        arch_service_status_list[m] = (gauge)
-
-    arch_flask_view = FlaskPrometheusView(arch_service_status_list,
-                                    arch_req_metrics,
-                                    arch_collector)
-
-    arch_path = '/arch_metrics/'
-    app.add_url_rule(arch_path, 'arch_metrics', arch_flask_view)
-
-
-    return app
-
+    def run_server(self):
+        self.create_all_views()
+        self.app.run('0.0.0.0', '8091')
 
 if __name__ == '__main__':
-    app = flask_app_factory()
-    app.run('0.0.0.0', '8091')
-    #parse_metrics_config()
+    app = metrics_app()
+    app.run_server()
