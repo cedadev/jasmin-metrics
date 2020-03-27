@@ -15,7 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from . import views 
+ 
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.index),
+    path('arch_metrics/', views.arch_metrics),
+    path('metrics/', views.freq_metrics),
+    path('daily_metrics/', views.daily_metrics),
+    path('weekly_metrics/', views.weekly_metrics),
+    path('monthly_metrics/', views.monthly_metrics),
 ]

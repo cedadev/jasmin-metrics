@@ -1,15 +1,15 @@
-import scripts.utils as ut
+from  .utils import *
 import requests
 import scipy.integrate as it
 import numpy as np
 import re
-from scripts.xdmod import XdMOD
+from .xdmod import XdMOD
 import datetime
 
 class LotusMetrics:
 
     def __init__(self):
-        self.client = ut.get_influxdb_client('lsfMetrics')
+        self.client = get_influxdb_client('lsfMetrics')
         self.hosts = self.get_all_lotus_hosts()
         self.xdmod = XdMOD()
     
@@ -89,7 +89,7 @@ class LotusMetrics:
 
         for h in self.hosts:
             # get the in first
-            data = ut.get_host_metrics_report(h, 'network_report')
+            data = get_host_metrics_report(h, 'network_report')
             in_report = data[0]
             dt = self.calc_dt(in_report)
             in_data = [x[0] for x in in_report['datapoints']]
@@ -132,7 +132,7 @@ class LotusMetrics:
 
         for h in self.hosts:
             # get the in first
-            data = ut.get_host_metrics_report(h, 'network_report', period='hour')
+            data = get_host_metrics_report(h, 'network_report', period='hour')
             in_report = data[0]
             in_val = np.sum([x[0] for x in in_report['datapoints']][-5:]) / (5)
             if in_report['metric_name'].strip() == 'In':

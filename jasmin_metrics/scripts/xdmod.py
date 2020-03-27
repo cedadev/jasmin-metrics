@@ -51,6 +51,9 @@ class XdMOD(object):
                            #'cpu_usage':'total_cpu_hours',
                            #'uniq_users':'statistic_Jobs_none_active_person_count'}
 
+    def set_param(self, param, value):
+        self.gubbins[param] = value
+
     def _get_raw(self, statistic='total_cpu_hours', start_date='2016-01-01', end_date='2016-12-31'):
         """ Return raw XDMOD output"""
         url = '%s/%s' % (self.host, self.interface)

@@ -25,7 +25,7 @@ SECRET_KEY = 'j+-f&k+2ad6#(0&c5_o*g%a#@w2f2de_nu_vo0-m_2u()$t!v_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['metrics1.jasmin.ac.uk']
 
 
 # Application definition
