@@ -23,6 +23,8 @@ class MetricsView(object):
         arch = ArchiveMetrics()
         #users = UsersMetrics()
 
+        self.req_metrics = self.parse_metrics_config(req_metrics_file)
+
         # define dictionary of calculation functions
         self.met_funcs = {
             'storage_total': storage.get_storage_total,
@@ -133,6 +135,7 @@ class MetricsView(object):
             #'users_jasmin_login_new_quarter': users.get_users_jasmin_login_new_quarter,
 }
 
+<<<<<<< HEAD:jasmin_metrics/metrics.py
         self.service_status_list = {}
         # gauges
         for m in self.req_metrics['gauge']:
@@ -141,6 +144,11 @@ class MetricsView(object):
 
 
     def parse_metrics_config(self, fname):
+=======
+
+
+    def parse_metrics_config(self, fname='./metrics.ini'):
+>>>>>>> master:jasmin_metrics/metrics.py
         req_metrics = {}
         config = configparser.ConfigParser()
         config.read(fname)
@@ -148,8 +156,45 @@ class MetricsView(object):
 
         return req_metrics
 
+<<<<<<< HEAD:jasmin_metrics/metrics.py
     def create_view(self):
         for m in self.req_metrics['gauge']:
             self.service_status_list[m].set(self.met_funcs[m]())
 
         return pc.generate_latest(registry=self.collector)
+=======
+    def gen_metrics(self):
+        collector = pc.CollectorRegistry()
+        service_status_list = {}
+        # gauges
+        for m in self.req_metrics['gauge']:
+            gauge = pc.Gauge(m, m, registry=collector)
+            service_status_list[m] = (gauge)
+
+        return service_status_list
+
+    def create_view(self):
+        service_status_list = gen_metrics()
+
+        for m in self.req_metrics['gauge']:
+            service_status_list[m].set(self.met_funcs[m]())
+
+        return pc.generate_latest(registry=self.collector)
+
+
+    def create_metrics_view(self):
+        return self.create_view('./metrics.ini', '/metrics/', 'metrics')
+    
+    def create_daily_metrics_view(self):
+        return self.create_view('./daily_metrics.ini','/daily_metrics/','daily metrics')
+
+    def create_weekly_metrics_view(self):
+        return self.create_view('./weekly_metrics.ini','/weekly_metrics/','weekly metrics')
+
+    def create_monthly_metrics_view(self):
+        return self.create_view('./monthly_metrics.ini','/monthly_metrics/','monthly metrics')
+
+    def create_arch_metrics_view(self):
+        return self.create_view('./arch_metrics.ini','/arch_metrics/','archive metrics')
+
+>>>>>>> master:jasmin_metrics/metrics.py

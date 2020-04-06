@@ -1,4 +1,4 @@
-from  .utils import *
+from .utils import *
 import requests
 import scipy.integrate as it
 import numpy as np
