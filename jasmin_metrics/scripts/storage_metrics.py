@@ -1,9 +1,9 @@
-import scripts.utils as ut
+from .utils import *
 
 class StorageMetrics:
 
     def __init__(self):
-        self.client = ut.get_influxdb_client()
+        self.client = get_influxdb_client()
 
     def get_scd_last_elt(self):
         """ Get the last storage from 'EquallogicTotal' measurements.
