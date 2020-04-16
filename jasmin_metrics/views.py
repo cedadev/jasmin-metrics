@@ -7,7 +7,9 @@ def index(request):
     return render(request, 'jasmin_metrics/index.html')
 
 def metrics_list(request, period):
-    pass    
+    mv = MetricsView(period)
+    metrics = mv.req_metrics
+    return render(request, 'jasmin_metrics/metrics_list.html', {'period':period, 'metrics': metrics})
 
 def dashboards(request):
     return render(request, 'jasmin_metrics/dashboards.html')

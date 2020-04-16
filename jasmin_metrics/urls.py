@@ -26,4 +26,5 @@ urlpatterns = [
     path('', views.index),
     path('dashboards/', views.dashboards),
     path('metrics/<str:period>/', views.prom_metrics),
+    path('metrics/<str:period>/list', views.metrics_list),
 ]

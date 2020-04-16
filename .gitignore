@@ -4,3 +4,4 @@ venv
 .vagrant
 *.pyc
 db.sqlite3
+nohup.out
