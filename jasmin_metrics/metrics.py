@@ -11,10 +11,11 @@ from .scripts.tape_metrics import TapeMetrics
 #from scripts.users_metrics import UsersMetrics
 from .scripts.power_metrics import PowerMetrics
 import time
+import os
 
 
 class MetricsView(object):
-    def __init__(self, metrics_group, req_metrics_file='jasmin_metrics/metrics.ini'):
+    def __init__(self, metrics_group, req_metrics_file=os.environ['JASMIN_METRICS_CONFIG']):
         self.collector = pc.CollectorRegistry()
         self.metrics_group = metrics_group
         lotus = LotusMetrics()
