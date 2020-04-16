@@ -1,0 +1,19 @@
+{% extends 'jasmin_theme/layout.html' %}
+
+{% block head_title %}JASMIN Metrics Home{% endblock %}
+
+{% block content_header %}{% endblock %}
+
+{% block content %}
+    <h1>JASMIN Metrics Index</h1>
+    <p>Each of the below links to the prometheus end point for the metrics coresponding to the collection period.</p>
+    <ul>
+      <li><a href="metrics/daily">Daily Metrics</a></li>
+        <p>Daily collected metrics</p>
+      <li><a href="metrics/weekly">Weekly Metrics</a></li>
+      <li><a href="metrics/monthly">Monthly Metrics</a></li>
+      <li><a href="metrics/freq">Frequent Metrics</a></li>
+      <li><a href="metrics/archive">Archive Metrics</a></li>
+    </ul>
+    <p>For links to the dashboards, click <a href="dashboards">here</a></p>
+{% endblock %}

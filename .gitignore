@@ -3,4 +3,4 @@ venv
 .idea
 .vagrant
 *.pyc
-
+db.sqlite3

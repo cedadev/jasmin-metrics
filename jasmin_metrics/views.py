@@ -1,9 +1,20 @@
 from .metrics import MetricsView
 from django.http import HttpResponse
+from django.shortcuts import render
 
 
 def index(request):
-    return HttpResponse('Metrics Index')
+    return render(request, 'jasmin_metrics/index.html')
+
+def metrics_list(request, period):
+    pass    
+
+def dashboards(request):
+    return render(request, 'jasmin_metrics/dashboards.html')
+
+def prom_metrics(request, period):
+    mv = MetricsView(period)
+    return HttpResponse(mv.create_view(), content_type='text/plain')
 
 def arch_metrics(request):
     am = MetricsView('archive')
