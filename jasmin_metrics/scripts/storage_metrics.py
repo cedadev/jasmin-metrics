@@ -69,24 +69,15 @@ class StorageMetrics:
                 data_cp.append(d)
         df = pd.DataFrame(data_cp,columns=raw['columns'])
         df['VolumeName_gws'] = df['VolumeName']
-        df.drop(columns=['VolumeID', 'VolumeUsageGB', 'VolumeCapacityGB'], inplace=True)
         df.replace({'VolumeName':{'gws_':''}}, regex=True, inplace=True)
         df.replace({'VolumeName':{'jasmin_':''}}, regex=True, inplace=True)
         return df
 
-    def get_gws_query(self, gws, metric):
-        df = self.gws_df
-        gws_info = df[df['VolumeName'] == gws]
-        q = self.client.query("SELECT {} from FileStorage \
-                               WHERE time > now() - 1d AND VolumeName = '{}'"\
-                              .format(metric, gws_info['VolumeName_gws'].values[0]))
-        return q.raw['series'][0]['values'][0][1]
-
     def get_storage_gws_used(self, gws):
-        return self.get_gws_query(gws, 'VolumeUsageGB')
+        return self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeUsageGB']
 
     def get_storage_gws_provision(self, gws):
-        return self.get_gws_query(gws, 'VolumeCapacityGB')
+        return self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeCapacityGB']
 
     def get_storage_summary(self):
         # returns the total PFS available
