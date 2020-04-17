@@ -1,4 +1,4 @@
-import scripts.utils as ut
+from  .utils import *
 import logging
 import time
 import subprocess
@@ -9,7 +9,7 @@ class ArchiveMetrics:
     
     def get_host_load(self, host, metric):
         # get the last value for the given host and load metric from ganglia
-        data = ut.get_host_metrics_report(host,"load_report",period='hour')
+        data = get_host_metrics_report(host,"load_report",period='hour')
         if metric == "load_one":
             data = data[0]
         last = data['datapoints'][-2][0] # sometimes the -1 element is zero so just take the -2
@@ -17,14 +17,14 @@ class ArchiveMetrics:
 
     def get_host_mem(self, host, metric):
         # get the last value for given host an mem metric from ganglia
-        data = ut.get_host_metrics_report(host,"mem_report",period='hour')
+        data = get_host_metrics_report(host,"mem_report",period='hour')
         if metric == "swap":
             data = data[4]
         last = data['datapoints'][-2][0]
         return last
 
     def host_up(self, host):
-        ping = subprocess.call(['ping', '-c', '1', host]) == 0
+        ping = subprocess.call(['ping', '-q', '-c', '1', host]) == 0
 
         if ping:
             ret_val = 1

@@ -1,0 +1,13 @@
+{% extends 'jasmin_theme/layout.html' %}
+
+{% block head_title %} {{ period|title }} Metrics List{% endblock %}
+
+{% block content %}
+  <h1>{{ period|title  }} Metrics List</h1>
+  <ul>
+    {% for m in  metrics %}
+      <li>{{ m }}</li>
+    {% endfor %}
+  </ul>  
+{% endblock %}
+

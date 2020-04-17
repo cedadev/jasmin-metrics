@@ -2,5 +2,6 @@ venv
 *.vpp*
 .idea
 .vagrant
-.pyc
-
+*.pyc
+db.sqlite3
+nohup.out
