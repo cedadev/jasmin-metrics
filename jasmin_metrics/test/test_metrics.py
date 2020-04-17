@@ -27,3 +27,4 @@ class TestMetrics(unittest.TestCase):
     def test_archive_metrics_list(self):
         mv = MetricsView('archive')
         self.assertTrue(mv.req_metrics)
+
