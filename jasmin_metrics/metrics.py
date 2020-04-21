@@ -13,10 +13,12 @@ from .scripts.power_metrics import PowerMetrics
 from .scripts.utils import get_influxdb_client
 import time
 import os
+import pandas as pd
+import re
 
 
 class MetricsView(object):
-    def __init__(self, metrics_group, req_metrics_file=os.environ['JASMIN_METRICS_CONFIG']):
+    def __init__(self, metrics_group, req_metrics_file=os.environ['JASMIN_METRICS_ROOT']+'metrics.ini'):
         self.collector = pc.CollectorRegistry()
         self.metrics_group = metrics_group
         self.lotus = LotusMetrics()
@@ -24,7 +26,7 @@ class MetricsView(object):
         self.mc = MCMetrics()
         self.arch = ArchiveMetrics()
         #users = UsersMetrics()
-
+        self.gws_consortium = pd.read_csv(os.environ['JASMIN_METRICS_ROOT']+'gws_consortiums.csv', header = 0)
         self.req_metrics = self.parse_metrics_config(req_metrics_file)
 
         self.service_status_list = {}
@@ -39,7 +41,7 @@ class MetricsView(object):
                 m_func = eval('self.storage.get_{}'.format(m))
             self.met_funcs[m] = m_func
             if 'storage_gws' in m:
-                gauge = pc.Gauge(m, m, ['gws_name',], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['gws_name','consortium', 'volume_type'], registry=self.collector)
             else:
                 gauge = pc.Gauge(m, m, registry=self.collector)
             self.service_status_list[m] = (gauge)
@@ -56,8 +58,15 @@ class MetricsView(object):
         for m in self.req_metrics:
             if 'storage_gws' in m:
                 for index, gws in self.storage.gws_df.iterrows():
+                    consortium = "other"
                     gws_name = gws['VolumeName'].split('/')[-1]
-                    self.service_status_list[m].labels(gws_name=gws_name).set(self.met_funcs[m](gws['VolumeName']))
+                    for index, line in self.gws_consortium.iterrows():
+                        gws_name_match = re.sub('_vol\d', '', gws_name)
+                        if 'wiser' in gws_name_match:
+                            gws_name_match = 'wiser'
+                        if line['gws_name'] == gws_name_match:
+                            consortium = line['consortium']
+                    self.service_status_list[m].labels(gws_name=gws_name, consortium=consortium, volume_type=gws['VolumeType']).set(self.met_funcs[m](gws['VolumeName']))
             else:
                 self.service_status_list[m].set(self.met_funcs[m]())
 

@@ -27,4 +27,7 @@ class TestMetrics(unittest.TestCase):
     def test_archive_metrics_list(self):
         mv = MetricsView('archive')
         self.assertTrue(mv.req_metrics)
-
+    
+    def test_consortium_df(self):
+        mv = MetricsView('monthly')
+        print(mv.gws_consortium)

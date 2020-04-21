@@ -64,20 +64,29 @@ class StorageMetrics:
         cols = raw['columns']
         data = raw['values']
         data_cp = []
+        vol_type = []
         for d in data:
-            if not '/datacentre/' in d[-2]:
+            if 'group_workspace' in d[-2] or 'gws' in d[-2]:
                 data_cp.append(d)
+                if 'QB' in d[1]:
+                    vol_type.append('SOF')
+                elif 'PAN' in d[1]:
+                    vol_type.append('PFS')
+                else:
+                    vol_type.append('UNKW')
         df = pd.DataFrame(data_cp,columns=raw['columns'])
         df['VolumeName_gws'] = df['VolumeName']
+        df['VolumeType'] = vol_type
         df.replace({'VolumeName':{'gws_':''}}, regex=True, inplace=True)
         df.replace({'VolumeName':{'jasmin_':''}}, regex=True, inplace=True)
+        
         return df
 
     def get_storage_gws_used(self, gws):
-        return self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeUsageGB']
+        return float(self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeUsageGB'].values[0])
 
     def get_storage_gws_provision(self, gws):
-        return self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeCapacityGB']
+        return float(self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeCapacityGB'].values[0])
 
     def get_storage_summary(self):
         # returns the total PFS available
