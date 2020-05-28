@@ -12,6 +12,10 @@ class StorageMetrics:
         """
 
         last_res = self.client.query('select * from EquallogicTotals where time > now() - 1d')
+        if len(last_res) == 0:
+            last_res = self.client.query('select * from EquallogicTotals where time > now() - 28h')
+        
+
         raw_data = last_res.raw['series']
 
         data = {}
@@ -74,7 +78,7 @@ class StorageMetrics:
                     vol_type.append('PFS')
                 else:
                     vol_type.append('UNKW')
-        df = pd.DataFrame(data_cp,columns=raw['columns'])
+        df = pd.DataFrame(data_cp,columns=cols)
         df['VolumeName_gws'] = df['VolumeName']
         df['VolumeType'] = vol_type
         df.replace({'VolumeName':{'gws_':''}}, regex=True, inplace=True)

@@ -68,10 +68,11 @@ class LotusMetrics:
 
 
     def get_all_lotus_hosts(self):
-        q = self.client.query('select hostname,maxjobs from lsfhoststatus where time > now() - 30m')
+        q = self.client.query('select * from lsfhoststatus where time > now() - 30m')
         if len(q) == 0:
-            q = self.client.query('select hostname,maxjobs from lsfhoststatus where time > now() - 1h')
-        hosts = [x[1] for x in q.raw['series'][0]['values'] if 'host' in x[1]]
+            q = self.client.query('select * from lsfhoststatus where time > now() - 1h')
+
+        hosts = [x[1] for x in q.raw['series'][0]['values'] if 'host' in x[3]]
         return hosts
 
 

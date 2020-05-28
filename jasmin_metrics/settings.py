@@ -25,12 +25,13 @@ SECRET_KEY = 'j+-f&k+2ad6#(0&c5_o*g%a#@w2f2de_nu_vo0-m_2u()$t!v_'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['metrics1.jasmin.ac.uk']
+ALLOWED_HOSTS = ['metrics1.jasmin.ac.uk','localhost']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'jasmin_metadata',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'jasmin_metrics',
-    'jasmin_theme'
+    'jasmin_theme',
+    'jasmin_auth',
+    'jasmin_notifications',
+    'jasmin_services'
 ]
 
 MIDDLEWARE = [
@@ -120,3 +124,34 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# JASMIN account settings
+JASMIN_SERVICES = {
+    'LDAP_GROUPS': [
+    ],
+}
+
+DATABASES = {
+    'default': {
+        'HOST': 'accounts1.jasmin.ac.uk',
+        'PORT': 5432,
+        'USER': 'db_backup',
+        'PASSWORD': 'nAYrEUpYM4WX0h64217tAbE7o10G8JDHAvf3MoXg',
+        'NAME': 'jasminaccount',
+        'ENGINE': 'django.db.backends.postgresql',
+    }
+}
+
+JASMIN_AUTH = {
+    'LDAP': {
+        'BASE_DN': '',
+        'UID_NUMBER_MIN': -1,
+        'UID_NUMBER_MAX': -1,
+        'GID_NUMBER': -1,
+        'HOME_DIR': '',
+        'SHELL': '',
+    },
+}
+
+AUTH_USER_MODEL = 'jasmin_auth.JASMINUser'
+
