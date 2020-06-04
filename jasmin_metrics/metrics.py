@@ -45,10 +45,16 @@ class MetricsView(object):
             else:
                 raise ValueError('Metric {} failed function assignment')
             self.met_funcs[m] = m_func
-            if 'storage_gws' in m:
+            if m.startswith('storage_gws'):
                 gauge = pc.Gauge(m, m, ['gws_name','consortium', 'volume_type'], registry=self.collector)
-            elif 'cloud_tenancy' in m:
+            elif m.startswith('cloud_tenancy'):
                 gauge = pc.Gauge(m, m, ['type', 'tenancy'], registry=self.collector)
+            elif m.startswith('users_gws'):
+                gauge = pc.Gauge(m, m, ['gws_name'], registry=self.collector)
+            elif m.startswith('users_cloud'):
+                gauge = pc.Gauge(m, m, ['type', 'tenancy'], registry=self.collector)
+            elif m.startswith('users_vm'):
+                gauge = pc.Gauge(m, m, ['vm_name', 'type'], registry=self.collector)
             else:
                 gauge = pc.Gauge(m, m, registry=self.collector)
             self.service_status_list[m] = (gauge)
@@ -63,7 +69,7 @@ class MetricsView(object):
 
     def create_view(self):
         for m in self.req_metrics:
-            if 'storage_gws' in m:
+            if m.startswith('storage_gws'):
                 for index, gws in self.storage.gws_df.iterrows():
                     consortium = "other"
                     gws_name = gws['VolumeName'].split('/')[-1]
@@ -75,7 +81,7 @@ class MetricsView(object):
                             consortium = line['consortium']
                     self.service_status_list[m].labels(gws_name=gws_name, consortium=consortium, volume_type=gws['VolumeType']).set(self.met_funcs[m](gws['VolumeName']))
 
-            elif 'cloud_tenancy' in m:
+            elif m.startswith('cloud_tenancy'):
                 for index, t in self.cloud.ten_df.iterrows():
                     tenancy = t['Project_Name']
                     if tenancy.endswith('-U'):
@@ -87,6 +93,27 @@ class MetricsView(object):
                     else:
                         type_ = 'unknown' 
                     self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](t['Project_Name']))
+
+            elif m.startswith('users_gws'):
+                for name in self.users.get_list_gws():
+                    self.service_status_list[m].labels(gws_name=name).set(self.met_funcs[m](name))
+
+            elif m.startswith('users_cloud'):
+                for tenancy in self.users.get_list_tenancies():
+                    if tenancy.endswith('-U'):
+                        type_ = 'external'
+                    elif tenancy.endswith('-M'):
+                        type_ = 'managed'
+                    elif tenancy.endswith('-S'):
+                        type_ = 'special'
+                    else:
+                        type_ = 'unknown'
+                    self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](tenancy))
+
+            elif m.startswith('users_vm'):
+                for name in self.users.get_list_vms_project():
+                    self.service_status_list[m].labels(vm_name=name, type='project').set(self.met_funcs[m](name))
+
             else:
                 self.service_status_list[m].set(self.met_funcs[m]())
 
