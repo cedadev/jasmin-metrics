@@ -1,11 +1,24 @@
 from .utils import *
 import pandas as pd
+import time
+import numpy as np
 
 class StorageMetrics:
 
     def __init__(self):
         self.client = get_influxdb_client()
         self.gws_df = self.get_gws_df()
+        self.update_time = time.time()
+
+    def check_last_frame_gen(self):
+        # the generation of the pandas frames is in the init, so we need to check that these have been updated recently
+        # enough
+        now = time.time()
+        if now-self.update_time > 7200:
+            # generate pandas frame for all services and pks
+            self.gws_df = self.get_gws_df()
+            # update the update time
+            self.update_time = time.time()
 
     def get_scd_last_elt(self):
         """ Get the last storage from 'EquallogicTotal' measurements.
@@ -86,10 +99,26 @@ class StorageMetrics:
         
         return df
 
+    def get_archive_df(self):
+        # get a pandas dataframe containing all the gws volumes
+        last_res = self.client.query('select * from FileStorage WHERE time > now() - 1d')
+        raw = last_res.raw['series'][0]
+        cols = raw['columns']
+        data = raw['values']
+        data_cp = []
+        for d in data:
+            if 'archvol' in d[-2]:
+                data_cp.append(d)
+        df = pd.DataFrame(data_cp,columns=cols)
+
+        return df
+
     def get_storage_gws_used(self, gws):
+        self.check_last_frame_gen()
         return float(self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeUsageGB'].values[0])
 
     def get_storage_gws_provision(self, gws):
+        self.check_last_frame_gen()
         return float(self.gws_df[self.gws_df['VolumeName'] == gws]['VolumeCapacityGB'].values[0])
 
     def get_storage_summary(self):
@@ -166,3 +195,23 @@ class StorageMetrics:
 
     def get_storage_sof_used(self):
         return self.get_storage_summary()['QB-com']
+
+    def get_storage_count_gws(self):
+        self.check_last_frame_gen()
+        return len(self.gws_df)
+
+    def get_storage_total_gws_provision(self):
+        self.check_last_frame_gen()
+        return np.sum(self.gws_df['VolumeCapacityGB'])
+
+    def get_storage_total_gws_used(self):
+        self.check_last_frame_gen()
+        return np.sum(self.gws_df['VolumeUsageGB'])
+
+    def get_storage_total_archive_provision(self):
+        df = self.get_archive_df()
+        return np.sum(df['VolumeCapacityGB'])
+
+    def get_storage_total_archive_used(self):
+        df= self.get_archive_df()
+        return np.sum(df['VolumeUsageGB'])

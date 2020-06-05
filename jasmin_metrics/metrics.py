@@ -55,6 +55,12 @@ class MetricsView(object):
                 gauge = pc.Gauge(m, m, ['type', 'tenancy'], registry=self.collector)
             elif m.startswith('users_vm'):
                 gauge = pc.Gauge(m, m, ['vm_name', 'type'], registry=self.collector)
+            elif m == 'users_jasmin_country':
+                gauge = pc.Gauge(m, m, ['country'], registry=self.collector)
+            elif m == 'users_jasmin_institution':
+                gauge = pc.Gauge(m, m, ['institution'], registry=self.collector)
+            elif m == 'users_jasmin_discipline':
+                gauge = pc.Gauge(m, m, ['discipline'], registry=self.collector)
             else:
                 gauge = pc.Gauge(m, m, registry=self.collector)
             self.service_status_list[m] = (gauge)
@@ -69,7 +75,9 @@ class MetricsView(object):
 
     def create_view(self):
         for m in self.req_metrics:
+            print('Working on {}'.format(m))
             if m.startswith('storage_gws'):
+
                 for index, gws in self.storage.gws_df.iterrows():
                     consortium = "other"
                     gws_name = gws['VolumeName'].split('/')[-1]
@@ -113,6 +121,19 @@ class MetricsView(object):
             elif m.startswith('users_vm'):
                 for name in self.users.get_list_vms_project():
                     self.service_status_list[m].labels(vm_name=name, type='project').set(self.met_funcs[m](name))
+
+            elif m == 'users_jasmin_institution':
+                for i in self.users.get_list_institution():
+                    self.service_status_list[m].labels(institution=i.name).set(self.met_funcs[m](i))
+
+            elif m == 'users_jasmin_discipline':
+                for d in self.users.get_list_disciplines():
+                    self.service_status_list[m].labels(discipline=d).set(self.met_funcs[m](d))
+
+            elif m == 'users_jasmin_country':
+                for c in self.users.get_list_countries():
+                    print('Working on {}'.format(c))
+                    self.service_status_list[m].labels(country=c).set(self.met_funcs[m](c))
 
             else:
                 self.service_status_list[m].set(self.met_funcs[m]())
