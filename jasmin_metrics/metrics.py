@@ -25,6 +25,7 @@ class MetricsView(object):
         self.cloud = CloudMetrics()
         self.arch = ArchiveMetrics()
         self.users = UsersMetrics()
+        self.tape = TapeMetrics()
         self.gws_consortium = pd.read_csv(os.environ['JASMIN_METRICS_ROOT']+'gws_consortiums.csv', header = 0)
         self.req_metrics = self.parse_metrics_config(req_metrics_file)
 
@@ -42,6 +43,8 @@ class MetricsView(object):
                 m_func = eval('self.cloud.get_{}'.format(m))
             elif m.startswith('users_'):
                 m_func = eval('self.users.get_{}'.format(m))
+            elif m.startswith('tape_'):
+                m_func = eval('self.tape.get_{}'.format(m))
             else:
                 raise ValueError('Metric {} failed function assignment')
             self.met_funcs[m] = m_func
@@ -61,6 +64,9 @@ class MetricsView(object):
                 gauge = pc.Gauge(m, m, ['institution'], registry=self.collector)
             elif m == 'users_jasmin_discipline':
                 gauge = pc.Gauge(m, m, ['discipline'], registry=self.collector)
+            elif m.startswith('tape_gws'):
+                gauge = pc.Gauge(m, m, ['gws_name'], registry=self.collector)
+
             else:
                 gauge = pc.Gauge(m, m, registry=self.collector)
             self.service_status_list[m] = (gauge)
@@ -134,6 +140,10 @@ class MetricsView(object):
                 for c in self.users.get_list_countries():
                     print('Working on {}'.format(c))
                     self.service_status_list[m].labels(country=c).set(self.met_funcs[m](c))
+
+            elif m.startswith('tape_gws'):
+                for g in self.tape.get_gws_list():
+                    self.service_status_list[m].labels(gws_name=g).set(self.met_funcs[m](g))
 
             else:
                 self.service_status_list[m].set(self.met_funcs[m]())
