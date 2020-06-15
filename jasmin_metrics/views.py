@@ -1,4 +1,5 @@
 from .metrics import MetricsView
+from .reports import VolumeReport
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -11,8 +12,6 @@ def metrics_list(request, period):
     metrics = mv.req_metrics
     return render(request, 'jasmin_metrics/metrics_list.html', {'period':period, 'metrics': metrics})
 
-def dashboards(request):
-    return render(request, 'jasmin_metrics/dashboards.html')
 
 def prom_metrics(request, period):
     mv = MetricsView(period)
@@ -38,4 +37,7 @@ def monthly_metrics(request):
     mm = MetricsView('monthly')
     return HttpResponse(mm.create_view(), content_type='text/plain')
 
+def volume_report(request):
+    vr = VolumeReport()
+    return vr.create_view()
 
