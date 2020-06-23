@@ -10,7 +10,6 @@ class LotusMetrics:
 
     def __init__(self):
         self.client = get_influxdb_client('lsfMetrics')
-        self.hosts = self.get_all_lotus_hosts()
         self.xdmod = XdMOD()
     
     def today(self):
@@ -85,10 +84,11 @@ class LotusMetrics:
     def get_lotus_network_traffic_tbmonth(self):
         # should be able to get the last 3 months from ganlia and integrate over it
 
+        hosts = self.get_all_lotus_hosts()
         in_sum = 0
         out_sum = 0
 
-        for h in self.hosts:
+        for h in hosts:
             # get the in first
             data = get_host_metrics_report(h, 'network_report')
             in_report = data[0]
@@ -131,7 +131,9 @@ class LotusMetrics:
         in_sum = 0
         out_sum = 0
 
-        for h in self.hosts:
+        hosts = self.get_all_lotus_hosts()
+
+        for h in hosts:
             # get the in first
             data = get_host_metrics_report(h, 'network_report', period='hour')
             in_report = data[0]

@@ -1,5 +1,5 @@
 from .metrics import MetricsView
-from .reports import VolumeReport
+from .scripts.reports import VolumeReport, GWSUsersReport
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -40,4 +40,8 @@ def monthly_metrics(request):
 def volume_report(request):
     vr = VolumeReport()
     return vr.create_view()
+
+def gws_users_report(request):
+    gr = GWSUsersReport()
+    return gr.create_view()
 

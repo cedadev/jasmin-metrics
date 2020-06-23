@@ -27,4 +27,5 @@ urlpatterns = [
     path('metrics/<str:period>/', views.prom_metrics),
     path('metrics/<str:period>/list', views.metrics_list),
     path('reports/volume', views.volume_report),
+    path('reports/gws_users', views.gws_users_report),
 ]
