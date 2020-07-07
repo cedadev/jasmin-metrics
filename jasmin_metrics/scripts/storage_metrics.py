@@ -215,3 +215,4 @@ class StorageMetrics:
     def get_storage_total_archive_used(self):
         df= self.get_archive_df()
         return np.sum(df['VolumeUsageGB'])
+
