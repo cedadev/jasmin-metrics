@@ -55,29 +55,35 @@ class TapeMetrics:
 
     def get_tape_et_datain_volume_day(self):
         table = self.get_et_summary_table()
-        last_24 = table[2]
-        assert last_24[0] == 'Throughput: files in last 24 hrs', "ET table results not being selected properly"
-        return float(last_24[2].split(':')[-1])
+        for line in table:
+            if line[0] == 'Throughput: files in last 24 hrs':
+                return float(line[2].split(':')[-1])
+	
+	raise ValueError("ET table results not being selected properly")
 
     def get_tape_et_datain_count_day(self):
         table = self.get_et_summary_table()
-        last_24 = table[2]
-        assert last_24[0] == 'Throughput: files in last 24 hrs', "ET table results not being selected properly"
-        return float(last_24[1].split(':')[-1])
+        for line in table:
+            if line[0] == 'Throughput: files in last 24 hrs':
+                return float(line[1].split(':')[-1])
+	
+	raise ValueError("ET table results not being selected properly")
 
     def get_tape_et_data_total_volume(self):
         table = self.get_et_summary_table()
-        synced = table[6]
-        assert synced[0] == 'Transfer state = SYNCED:DEFAULT', "ET table results not being selected properly"
-        vol = synced[-1][:-3]
-        return float(vol)
+        for line in table:
+            if line[0] == 'Transfer state = SYNCED:DEFAULT':
+                return float(line[-1][:-3])
+	
+	raise ValueError("ET table results not being selected properly")
 
     def get_tape_et_data_total_count(self):
         table = self.get_et_summary_table()
-        synced = table[6]
-        assert synced[0] == 'Transfer state = SYNCED:DEFAULT', "ET table results not being selected properly"
-        vol = synced[1].split(';')[-1].split(' ')[-2]
-        return float(vol)
+        for line in table:
+            if line[0] == 'Transfer state = SYNCED:DEFAULT':
+                return float(line[1].split(';')[-1].split(' ')[-2])
+	
+	raise ValueError("ET table results not being selected properly")
 
     def get_sd_summary_table(self):
         r = requests.get(self.sd_clock_watch_url)
@@ -89,29 +95,35 @@ class TapeMetrics:
 
     def get_tape_sd_datain_volume_day(self):
         table = self.get_sd_summary_table()
-        last_24 = table[2]
-        assert last_24[0] == 'Throughput: files in last 24 hrs', "ET table results not being selected properly"
-        return float(last_24[2].split(':')[-1])
+        for line in table:
+            if line[0] == 'Throughput: files in last 24 hrs':
+                return float(line[2].split(':')[-1])
+	
+	raise ValueError("SD table results not being selected properly")
 
     def get_tape_sd_datain_count_day(self):
         table = self.get_sd_summary_table()
-        last_24 = table[2]
-        assert last_24[0] == 'Throughput: files in last 24 hrs', "ET table results not being selected properly"
-        return float(last_24[1].split(':')[-1])
+        for line in table:
+            if line[0] == 'Throughput: files in last 24 hrs':
+                return float(line[1].split(':')[-1])
+	
+	raise ValueError("SD table results not being selected properly")
 
     def get_tape_sd_data_total_volume(self):
         table = self.get_sd_summary_table()
-        synced = table[6]
-        assert synced[0] == 'Transfer state = SYNCED:DEFAULT', "ET table results not being selected properly"
-        vol = synced[-1][:-3]
-        return float(vol)
+        for line in table:
+            if line[0] == 'Transfer state = SYNCED:DEFAULT':
+                return float(line[-1][:-3])
+	
+	raise ValueError("SD table results not being selected properly")
 
     def get_tape_sd_data_total_count(self):
         table = self.get_sd_summary_table()
-        synced = table[6]
-        assert synced[0] == 'Transfer state = SYNCED:DEFAULT', "ET table results not being selected properly"
-        vol = synced[1].split(';')[-1].split(' ')[-2]
-        return float(vol)
+        for line in table:
+            if line[0] == 'Transfer state = SYNCED:DEFAULT':
+                return float(line[1].split(';')[-1].split(' ')[-2])
+	
+	raise ValueError("SD table results not being selected properly")
 
     def get_sd_tape_table(self):
         r = requests.get(self.sd_tape_url)

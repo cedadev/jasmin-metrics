@@ -82,71 +82,75 @@ class MetricsView(object):
     def create_view(self):
         for m in self.req_metrics:
             print('Working on {}'.format(m))
-            if m.startswith('storage_gws'):
-
-                for index, gws in self.storage.gws_df.iterrows():
-                    consortium = "other"
-                    gws_name = gws['VolumeName'].split('/')[-1]
-                    for index, line in self.gws_consortium.iterrows():
-                        gws_name_match = re.sub('_vol\d', '', gws_name)
-                        if 'wiser' in gws_name_match:
-                            gws_name_match = 'wiser'
-                        if line['gws_name'] == gws_name_match:
-                            consortium = line['consortium']
-                    self.service_status_list[m].labels(gws_name=gws_name, consortium=consortium, volume_type=gws['VolumeType']).set(self.met_funcs[m](gws['VolumeName']))
-
-            elif m.startswith('cloud_tenancy'):
-                for index, t in self.cloud.ten_df.iterrows():
-                    tenancy = t['Project_Name']
-                    if tenancy.endswith('-U'):
-                       type_ = 'external'
-                    elif tenancy.endswith('-M'):
-                        type_ = 'managed'
-                    elif tenancy.endswith('-S'):
-                       type_ = 'special'
-                    else:
-                        type_ = 'unknown' 
-                    self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](t['Project_Name']))
-
-            elif m.startswith('users_gws'):
-                for name in self.users.get_list_gws():
-                    self.service_status_list[m].labels(gws_name=name).set(self.met_funcs[m](name))
-
-            elif m.startswith('users_cloud'):
-                for tenancy in self.users.get_list_tenancies():
-                    if tenancy.endswith('-U'):
-                        type_ = 'external'
-                    elif tenancy.endswith('-M'):
-                        type_ = 'managed'
-                    elif tenancy.endswith('-S'):
-                        type_ = 'special'
-                    else:
-                        type_ = 'unknown'
-                    self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](tenancy))
-
-            elif m.startswith('users_vm'):
-                for name in self.users.get_list_vms_project():
-                    self.service_status_list[m].labels(vm_name=name, type='project').set(self.met_funcs[m](name))
-
-            elif m == 'users_jasmin_institution':
-                for i in self.users.get_list_institution():
-                    self.service_status_list[m].labels(institution=i.name).set(self.met_funcs[m](i))
-
-            elif m == 'users_jasmin_discipline':
-                for d in self.users.get_list_disciplines():
-                    self.service_status_list[m].labels(discipline=d).set(self.met_funcs[m](d))
-
-            elif m == 'users_jasmin_country':
-                for c in self.users.get_list_countries():
-                    print('Working on {}'.format(c))
-                    self.service_status_list[m].labels(country=c).set(self.met_funcs[m](c))
-
-            elif m.startswith('tape_gws'):
-                for g in self.tape.get_gws_list():
-                    self.service_status_list[m].labels(gws_name=g).set(self.met_funcs[m](g))
-
-            else:
-                self.service_status_list[m].set(self.met_funcs[m]())
+            try:
+                if m.startswith('storage_gws'):
+    
+                    for index, gws in self.storage.gws_df.iterrows():
+                        consortium = "other"
+                        gws_name = gws['VolumeName'].split('/')[-1]
+                        for index, line in self.gws_consortium.iterrows():
+                            gws_name_match = re.sub('_vol\d', '', gws_name)
+                            if 'wiser' in gws_name_match:
+                                gws_name_match = 'wiser'
+                            if line['gws_name'] == gws_name_match:
+                                consortium = line['consortium']
+                        self.service_status_list[m].labels(gws_name=gws_name, consortium=consortium, volume_type=gws['VolumeType']).set(self.met_funcs[m](gws['VolumeName']))
+    
+                elif m.startswith('cloud_tenancy'):
+                    for index, t in self.cloud.ten_df.iterrows():
+                        tenancy = t['Project_Name']
+                        if tenancy.endswith('-U'):
+                           type_ = 'external'
+                        elif tenancy.endswith('-M'):
+                            type_ = 'managed'
+                        elif tenancy.endswith('-S'):
+                           type_ = 'special'
+                        else:
+                            type_ = 'unknown' 
+                        self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](t['Project_Name']))
+    
+                elif m.startswith('users_gws'):
+                    for name in self.users.get_list_gws():
+                        self.service_status_list[m].labels(gws_name=name).set(self.met_funcs[m](name))
+    
+                elif m.startswith('users_cloud'):
+                    for tenancy in self.users.get_list_tenancies():
+                        if tenancy.endswith('-U'):
+                            type_ = 'external'
+                        elif tenancy.endswith('-M'):
+                            type_ = 'managed'
+                        elif tenancy.endswith('-S'):
+                            type_ = 'special'
+                        else:
+                            type_ = 'unknown'
+                        self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](tenancy))
+    
+                elif m.startswith('users_vm'):
+                    for name in self.users.get_list_vms_project():
+                        self.service_status_list[m].labels(vm_name=name, type='project').set(self.met_funcs[m](name))
+    
+                elif m == 'users_jasmin_institution':
+                    for i in self.users.get_list_institution():
+                        self.service_status_list[m].labels(institution=i.name).set(self.met_funcs[m](i))
+    
+                elif m == 'users_jasmin_discipline':
+                    for d in self.users.get_list_disciplines():
+                        self.service_status_list[m].labels(discipline=d).set(self.met_funcs[m](d))
+    
+                elif m == 'users_jasmin_country':
+                    for c in self.users.get_list_countries():
+                        print('Working on {}'.format(c))
+                        self.service_status_list[m].labels(country=c).set(self.met_funcs[m](c))
+    
+                elif m.startswith('tape_gws'):
+                    for g in self.tape.get_gws_list():
+                        self.service_status_list[m].labels(gws_name=g).set(self.met_funcs[m](g))
+    
+                else:
+                    self.service_status_list[m].set(self.met_funcs[m]())
+            except Exception as e:
+                print('Error encountered in metric {}:\n{}'.format(m,e))
+                self.service_status_list[m].set(0)
 
         return pc.generate_latest(registry=self.collector)
 

@@ -156,7 +156,7 @@ class StorageMetrics:
 
         total['tot-cap'] = total['PFS-cap'] + total['QB-cap'] #+ total['EL-cap']
         total['tot-com'] = total['PFS-com'] + total['QB-com'] #+ get_openstack_vms_storage_quota()
-        total['tot-use'] = total['PFS-use'] + total['QB-use'] #+ total['EL-use'] + get_openstack_vms_storage_used()
+        total['tot-use'] = total['PFS-use'] + total['QB-com'] #+ total['EL-use'] + get_openstack_vms_storage_used()
 
         return total
 
@@ -215,3 +215,4 @@ class StorageMetrics:
     def get_storage_total_archive_used(self):
         df= self.get_archive_df()
         return np.sum(df['VolumeUsageGB'])
+
