@@ -58,32 +58,32 @@ class TapeMetrics:
         for line in table:
             if line[0] == 'Throughput: files in last 24 hrs':
                 return float(line[2].split(':')[-1])
-	
-	raise ValueError("ET table results not being selected properly")
+
+        raise ValueError("ET table results not being selected properly")
 
     def get_tape_et_datain_count_day(self):
         table = self.get_et_summary_table()
         for line in table:
             if line[0] == 'Throughput: files in last 24 hrs':
                 return float(line[1].split(':')[-1])
-	
-	raise ValueError("ET table results not being selected properly")
+
+        raise ValueError("ET table results not being selected properly")
 
     def get_tape_et_data_total_volume(self):
         table = self.get_et_summary_table()
         for line in table:
             if line[0] == 'Transfer state = SYNCED:DEFAULT':
                 return float(line[-1][:-3])
-	
-	raise ValueError("ET table results not being selected properly")
+
+        raise ValueError("ET table results not being selected properly")
 
     def get_tape_et_data_total_count(self):
         table = self.get_et_summary_table()
         for line in table:
             if line[0] == 'Transfer state = SYNCED:DEFAULT':
                 return float(line[1].split(';')[-1].split(' ')[-2])
-	
-	raise ValueError("ET table results not being selected properly")
+
+        raise ValueError("ET table results not being selected properly")
 
     def get_sd_summary_table(self):
         r = requests.get(self.sd_clock_watch_url)
@@ -98,32 +98,32 @@ class TapeMetrics:
         for line in table:
             if line[0] == 'Throughput: files in last 24 hrs':
                 return float(line[2].split(':')[-1])
-	
-	raise ValueError("SD table results not being selected properly")
+
+        raise ValueError("SD table results not being selected properly")
 
     def get_tape_sd_datain_count_day(self):
         table = self.get_sd_summary_table()
         for line in table:
             if line[0] == 'Throughput: files in last 24 hrs':
                 return float(line[1].split(':')[-1])
-	
-	raise ValueError("SD table results not being selected properly")
+
+        raise ValueError("SD table results not being selected properly")
 
     def get_tape_sd_data_total_volume(self):
         table = self.get_sd_summary_table()
         for line in table:
             if line[0] == 'Transfer state = SYNCED:DEFAULT':
                 return float(line[-1][:-3])
-	
-	raise ValueError("SD table results not being selected properly")
+
+        raise ValueError("SD table results not being selected properly")
 
     def get_tape_sd_data_total_count(self):
         table = self.get_sd_summary_table()
         for line in table:
             if line[0] == 'Transfer state = SYNCED:DEFAULT':
                 return float(line[1].split(';')[-1].split(' ')[-2])
-	
-	raise ValueError("SD table results not being selected properly")
+
+        raise ValueError("SD table results not being selected properly")
 
     def get_sd_tape_table(self):
         r = requests.get(self.sd_tape_url)
