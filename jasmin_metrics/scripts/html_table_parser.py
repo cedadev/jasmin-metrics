@@ -76,3 +76,4 @@ class HTMLTableParser(HTMLParser):
         elif tag == 'table':
             self.tables.append(self._current_table)
             self._current_table = []
+
