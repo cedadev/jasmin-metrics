@@ -4,12 +4,13 @@ from django.core import serializers
 import os
 from jasmin_services.models import Grant, Service, Role, Category
 from jasmin_auth.models import JASMINUser, Institution
-import datetime, time
+import datetime
+import time
+
 
 class UsersMetrics:
     def __init__(self):
-        
-        
+
         self.today = datetime.datetime.now()
 
         # generate pandas frame for all services and pks
@@ -67,7 +68,7 @@ class UsersMetrics:
             pks.append(s['pk'])
             names.append(s['fields']['name'])
             service.append(s['fields']['service'])
- 
+
         df = pd.DataFrame()
         df['pk'] = pks
         df['name'] = names
@@ -90,9 +91,11 @@ class UsersMetrics:
     def get_role_pk(self, service, category, role):
         self.check_last_frame_gen()
         # get the service primary key
-        service_pk = int(self.services[self.services['name'] == service][self.services['category'] == category]['pk'])
+        service_pk = int(self.services[self.services['name'] ==
+                                       service][self.services['category'] == category]['pk'])
         # get the role primary key
-        role_pk = self.roles[self.roles['service'] == service_pk][self.roles['name'] == role]['pk']
+        role_pk = self.roles[self.roles['service'] ==
+                             service_pk][self.roles['name'] == role]['pk']
 
         return int(role_pk)
 
@@ -113,20 +116,20 @@ class UsersMetrics:
         self.check_last_frame_gen()
 
         count = Grant.objects.order_by()\
-                     .filter(role = self.get_role_pk('jasmin-login', self.categories['login_services'], 'USER'))\
-                     .filter(granted_at__gte = self.today - datetime.timedelta(days=90),
-                             granted_at__lte = self.today)\
-                             .distinct('user').count()
+                     .filter(role=self.get_role_pk('jasmin-login', self.categories['login_services'], 'USER'))\
+                     .filter(granted_at__gte=self.today - datetime.timedelta(days=90),
+                             granted_at__lte=self.today)\
+            .distinct('user').count()
         return count
-    
+
     def get_users_jasmin_login_new_week(self):
         self.check_last_frame_gen()
 
         count = Grant.objects.order_by()\
-                     .filter(role = self.get_role_pk('jasmin-login', self.categories['login_services'], 'USER'))\
-                     .filter(granted_at__gte = self.today - datetime.timedelta(days=7),
-                             granted_at__lte = self.today)\
-                             .distinct('user').count()
+                     .filter(role=self.get_role_pk('jasmin-login', self.categories['login_services'], 'USER'))\
+                     .filter(granted_at__gte=self.today - datetime.timedelta(days=7),
+                             granted_at__lte=self.today)\
+            .distinct('user').count()
         return count
 
     def get_new_today(self, service_name, category, type):
@@ -141,7 +144,6 @@ class UsersMetrics:
     def get_users_jasmin_login_new_today(self):
         self.check_last_frame_gen()
         return self.get_new_today('jasmin-login', self.categories['login_services'], 'USER')
-
 
     def get_users_gws_active_today(self, gws_name):
         self.check_last_frame_gen()
@@ -227,3 +229,145 @@ class UsersMetrics:
             users += JASMINUser.objects.filter(institution=i.pk).count()
 
         return users
+
+
+class UsersBackfill(UsersMetrics):
+    """ This class uses the same format as the UsersMetrics class, but returns the generators required to upload history to ES
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def get_active(self, service, category, role, start, end):
+        self.check_last_frame_gen()
+        count = Grant.objects.order_by() \
+            .filter(role=self.get_role_pk(service, category, role)) \
+            .filter(revoked=False, expires__gte=start,
+                    granted_at__lt=end) \
+            .distinct('user').count()
+        return count
+
+    def get_jasmin_users_upto(self, date):
+        # counts number ofg jasmin accounts which would have existed at the date supplied since 2001
+        start_date = datetime.datetime.strptime('2001-01-01', '%Y-%m-%d')
+        return JASMINUser.objects.filter(date_joined__gte=start_date, date_joined__lt=date).count()
+
+    def get_users_jasmin(self, start, end):
+        dates = self._gen_time_list(start, end)
+
+        for d in dates:
+            t_dt = datetime.datetime.strptime(d, '%Y-%m-%dT%H:%M:%SZ')
+            yield {
+                "_index": "mjones-test2",
+                "_source": {
+                    "@timestamp": d,
+                    "prometheus": {
+                        "metrics": {'users_jasmin': self.get_jasmin_users_upto(t_dt)
+                                    },
+                        "labels": {
+                            "instance": "localhost:8091",
+                            "job": "prometheus"
+                        }
+                    },
+                    "event": {
+                        "duration": 5425153946,
+                        "dataset": "prometheus.collector",
+                        "module": "prometheus"
+                    },
+                    "metricset": {
+                        "period": 1200000,
+                        "name": "collector"
+                    },
+                    "service": {
+                        "address": "localhost:8091",
+                        "type": "prometheus"
+                    },
+                    "ecs": {
+                        "version": "1.4.0"
+                    },
+                    "host": {
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "architecture": "x86_64",
+                        "name": "metrics1.jasmin.ac.uk",
+                        "os": {
+                            "platform": "centos",
+                            "version": "7 (Core)",
+                            "family": "redhat",
+                            "name": "CentOS Linux",
+                            "kernel": "3.10.0-1062.18.1.el7.x86_64",
+                            "codename": "Core"
+                        },
+                        "containerized": False
+                    },
+                    "agent": {
+                        "ephemeral_id": "6570074e-f1f3-4fa3-aae4-e57ff12c71e6",
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "id": "515c3f57-1204-4a41-b84e-43c08b206a74",
+                        "version": "7.6.2",
+                        "type": "metricbeat"
+                    }
+                }
+            }
+        return JASMINUser.objects.count()
+
+    def _gen_time_list(self, start, end):
+        datelist = pd.date_range(
+            start=start+'T15:04:45.325Z', end=end+'T15:04:45.325Z')
+        return datelist.strftime('%Y-%m-%dT%H:%M:%SZ').tolist()
+
+    def get_users_jasmin_login_active_today(self, start, end):
+        dates = self._gen_time_list(start, end)
+
+        for d in dates:
+            t_dt = datetime.datetime.strptime(d, '%Y-%m-%dT%H:%M:%SZ')
+            yield {
+                "_index": "mjones-test2",
+                "_source": {
+                    "@timestamp": d,
+                    "prometheus": {
+                        "metrics": {'users_jasmin_login_active_today': self.get_active('jasmin-login', self.categories['login_services'], 'USER', t_dt, t_dt+datetime.timedelta(days=1))
+                                    },
+                        "labels": {
+                            "instance": "localhost:8091",
+                            "job": "prometheus"
+                        }
+                    },
+                    "event": {
+                        "duration": 5425153946,
+                        "dataset": "prometheus.collector",
+                        "module": "prometheus"
+                    },
+                    "metricset": {
+                        "period": 1200000,
+                        "name": "collector"
+                    },
+                    "service": {
+                        "address": "localhost:8091",
+                        "type": "prometheus"
+                    },
+                    "ecs": {
+                        "version": "1.4.0"
+                    },
+                    "host": {
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "architecture": "x86_64",
+                        "name": "metrics1.jasmin.ac.uk",
+                        "os": {
+                            "platform": "centos",
+                            "version": "7 (Core)",
+                            "family": "redhat",
+                            "name": "CentOS Linux",
+                            "kernel": "3.10.0-1062.18.1.el7.x86_64",
+                            "codename": "Core"
+                        },
+                        "containerized": False
+                    },
+                    "agent": {
+                        "ephemeral_id": "6570074e-f1f3-4fa3-aae4-e57ff12c71e6",
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "id": "515c3f57-1204-4a41-b84e-43c08b206a74",
+                        "version": "7.6.2",
+                        "type": "metricbeat"
+                    }
+                }
+            }

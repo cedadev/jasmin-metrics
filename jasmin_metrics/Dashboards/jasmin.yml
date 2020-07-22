@@ -1,0 +1,11 @@
+# # config file version
+apiVersion: 1
+
+providers:
+ - name: 'jasmin'
+   orgId: 1
+   folder: 'JASMIN Metrics'
+   folderUid: 'jm'
+   type: file
+   options:
+     path: /var/lib/grafana/jasmin-dash
