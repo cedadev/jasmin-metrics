@@ -1,5 +1,11 @@
 from influxdb import InfluxDBClient
 import os, requests
+import pandas as pd
+
+def gen_time_list(start, end):
+    datelist = pd.date_range(
+        start=start+'T15:04:45.325Z', end=end+'T15:04:45.325Z')
+    return datelist.strftime('%Y-%m-%dT%H:%M:%SZ').tolist()
 
 def get_creds(loc='environ'):
     if loc == 'environ':

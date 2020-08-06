@@ -49,26 +49,26 @@ class MetricsView(object):
                 raise ValueError('Metric {} failed function assignment')
             self.met_funcs[m] = m_func
             if m.startswith('storage_gws'):
-                gauge = pc.Gauge(m, m, ['gws_name','consortium', 'volume_type'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'gws_name','consortium', 'volume_type', 'gws_vol'], registry=self.collector)
             elif m.startswith('cloud_tenancy'):
-                gauge = pc.Gauge(m, m, ['type', 'tenancy'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'type', 'tenancy'], registry=self.collector)
             elif m.startswith('users_gws'):
-                gauge = pc.Gauge(m, m, ['gws_name'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'gws_name'], registry=self.collector)
             elif m.startswith('users_cloud'):
-                gauge = pc.Gauge(m, m, ['type', 'tenancy'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'type', 'tenancy'], registry=self.collector)
             elif m.startswith('users_vm'):
-                gauge = pc.Gauge(m, m, ['vm_name', 'type'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'vm_name', 'type'], registry=self.collector)
             elif m == 'users_jasmin_country':
-                gauge = pc.Gauge(m, m, ['country'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'country'], registry=self.collector)
             elif m == 'users_jasmin_institution':
-                gauge = pc.Gauge(m, m, ['institution'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'institution'], registry=self.collector)
             elif m == 'users_jasmin_discipline':
-                gauge = pc.Gauge(m, m, ['discipline'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'discipline'], registry=self.collector)
             elif m.startswith('tape_gws'):
-                gauge = pc.Gauge(m, m, ['gws_name'], registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name', 'gws_name'], registry=self.collector)
 
             else:
-                gauge = pc.Gauge(m, m, registry=self.collector)
+                gauge = pc.Gauge(m, m, ['metric_name'], registry=self.collector)
             self.service_status_list[m] = (gauge)
 
 
@@ -88,13 +88,18 @@ class MetricsView(object):
                     for index, gws in self.storage.gws_df.iterrows():
                         consortium = "other"
                         gws_name = gws['VolumeName'].split('/')[-1]
+                        gws_vol = gws['VolumeName'].split('/')[-1]
+                        if re.match( 'vol\d', gws_name):
+                            gws_name = gws['VolumeName'].split('/')[-2]
                         for index, line in self.gws_consortium.iterrows():
                             gws_name_match = re.sub('_vol\d', '', gws_name)
-                            if 'wiser' in gws_name_match:
-                                gws_name_match = 'wiser'
-                            if line['gws_name'] == gws_name_match:
-                                consortium = line['consortium']
-                        self.service_status_list[m].labels(gws_name=gws_name, consortium=consortium, volume_type=gws['VolumeType']).set(self.met_funcs[m](gws['VolumeName']))
+                        if 'wiser' in gws_name_match:
+                            gws_name_match = 'wiser'
+                        elif 'primavera' in gws_name_match:
+                            gws_name_match = 'primavera'
+                        if line['gws_name'] == gws_name_match:
+                            consortium = line['consortium']
+                        self.service_status_list[m].labels(metric_name=m, gws_vol=gws_vol, gws_name=gws_name_match, consortium=consortium, volume_type=gws['VolumeType']).set(self.met_funcs[m](gws['VolumeName']))
     
                 elif m.startswith('cloud_tenancy'):
                     for index, t in self.cloud.ten_df.iterrows():
@@ -107,11 +112,11 @@ class MetricsView(object):
                            type_ = 'special'
                         else:
                             type_ = 'unknown' 
-                        self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](t['Project_Name']))
+                        self.service_status_list[m].labels(metric_name=m, tenancy=tenancy, type=type_).set(self.met_funcs[m](t['Project_Name']))
     
                 elif m.startswith('users_gws'):
                     for name in self.users.get_list_gws():
-                        self.service_status_list[m].labels(gws_name=name).set(self.met_funcs[m](name))
+                        self.service_status_list[m].labels(metric_name=m, gws_name=name).set(self.met_funcs[m](name))
     
                 elif m.startswith('users_cloud'):
                     for tenancy in self.users.get_list_tenancies():
@@ -123,34 +128,34 @@ class MetricsView(object):
                             type_ = 'special'
                         else:
                             type_ = 'unknown'
-                        self.service_status_list[m].labels(tenancy=tenancy, type=type_).set(self.met_funcs[m](tenancy))
+                        self.service_status_list[m].labels(metric_name=m, tenancy=tenancy, type=type_).set(self.met_funcs[m](tenancy))
     
                 elif m.startswith('users_vm'):
                     for name in self.users.get_list_vms_project():
-                        self.service_status_list[m].labels(vm_name=name, type='project').set(self.met_funcs[m](name))
+                        self.service_status_list[m].labels(metric_name=m, vm_name=name, type='project').set(self.met_funcs[m](name))
     
                 elif m == 'users_jasmin_institution':
                     for i in self.users.get_list_institution():
-                        self.service_status_list[m].labels(institution=i.name).set(self.met_funcs[m](i))
+                        self.service_status_list[m].labels(metric_name=m, institution=i.name).set(self.met_funcs[m](i))
     
                 elif m == 'users_jasmin_discipline':
                     for d in self.users.get_list_disciplines():
-                        self.service_status_list[m].labels(discipline=d).set(self.met_funcs[m](d))
+                        self.service_status_list[m].labels(metric_name=m, discipline=d).set(self.met_funcs[m](d))
     
                 elif m == 'users_jasmin_country':
                     for c in self.users.get_list_countries():
                         print('Working on {}'.format(c))
-                        self.service_status_list[m].labels(country=c).set(self.met_funcs[m](c))
+                        self.service_status_list[m].labels(metric_name=m, country=c).set(self.met_funcs[m](c))
     
                 elif m.startswith('tape_gws'):
                     for g in self.tape.get_gws_list():
-                        self.service_status_list[m].labels(gws_name=g).set(self.met_funcs[m](g))
+                        self.service_status_list[m].labels(metric_name=m, gws_name=g).set(self.met_funcs[m](g))
     
                 else:
-                    self.service_status_list[m].set(self.met_funcs[m]())
+                    self.service_status_list[m].labels(metric_name=m).set(self.met_funcs[m]())
             except Exception as e:
                 print('Error encountered in metric {}:\n{}'.format(m,e))
-                self.service_status_list[m].set(0)
+                self.service_status_list[m].labels(metric_name=m).set(0)
 
         return pc.generate_latest(registry=self.collector)
 

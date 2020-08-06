@@ -6,10 +6,10 @@ from ceda_elasticsearch_tools.elasticsearch import CEDAElasticsearchClient
 from elasticsearch.helpers import bulk
 
 #from .scripts.archive_metrics import ArchiveBackfill
-#from .scripts.lotus_metrics import LotusBackfill
+from .scripts.lotus_metrics import LotusBackfill
 #from .scripts.cloud_metrics import CloudBackfill
 #from .scripts.network_metrics import NetworkBackfill
-#from .scripts.storage_metrics import StorageBackfill
+from .scripts.storage_metrics import StorageBackfill
 #from .scripts.tape_metrics import TapeBackfill
 from .scripts.users_metrics import UsersBackfill
 
@@ -32,8 +32,8 @@ class BackfillMetric(object):
         self.end = end
         self.metric = metric
         self.metric_group = metric_group
-        #self.lotus = LotusBackfill()
-        #self.storage = StorageBackfill()
+        self.lotus = LotusBackfill()
+        self.storage = StorageBackfill()
         #self.cloud = CloudBackfill()
         #self.arch = ArchiveBackfill()
         self.users = UsersBackfill()
@@ -69,5 +69,3 @@ if __name__ == "__main__":
                          'users_jasmin_login_active_today', 'daily',)
     print(bfm.gendocs())
 
-# 
-#bulk(es, gendata(times))

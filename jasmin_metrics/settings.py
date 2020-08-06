@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'jasmin_metrics',
-    'jasmin_theme',
     'jasmin_auth',
     'jasmin_notifications',
-    'jasmin_services'
+    'jasmin_services',
+    'jasmin_theme',
 ]
 
 MIDDLEWARE = [

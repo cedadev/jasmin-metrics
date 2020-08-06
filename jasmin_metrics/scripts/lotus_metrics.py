@@ -6,12 +6,12 @@ import re
 from .xdmod import XdMOD
 import datetime
 
-class LotusMetrics:
+class LotusGather(object):
 
     def __init__(self):
         self.client = get_influxdb_client('lsfMetrics')
         self.xdmod = XdMOD()
-    
+
     def today(self):
         return datetime.datetime.now().strftime('%Y-%m-%d')
     
@@ -228,6 +228,13 @@ class LotusMetrics:
         array_wall = self.xdmod.get_tsparam('total_wallduration_hours', start,stop)
         return array_wall
 
+class LotusMetrics(LotusGather):
+
+    def __init__(self):
+        super().__init__()
+    
+
+
     def get_lotus_core_hours_day(self):
         # get the last element from the xdmod extraction from today's data
         data = self.lotus_core_hours(self.yesterday(), self.today())['total_cpu_hours']
@@ -300,6 +307,138 @@ class LotusMetrics:
     def get_lotus_wall_dur_tot(self):
         data = self.lotus_wall_dur_tot(self.yesterday(),self.yesterday())
         return data.to_numpy()[-1]
+
+class LotusBackfill(LotusGather):
+
+    def __init__(self):
+        super().__init__()
+
+
+    def get_lotus_job_count_submitted_day(self, start, end):
+        dates = gen_time_list(start, end)
+
+        for d in dates:
+            t_dt = datetime.datetime.strptime(d, '%Y-%m-%dT%H:%M:%SZ')
+            data = self.lotus_job_count_submitted(t_dt,t_dt)
+            try: 
+                data_float = float(data.sum().to_numpy()[0])
+            except AttributeError:
+                data_float = 0
+            yield {
+                "_index": "mjones-test2",
+                "_source": {
+                    "@timestamp": d,
+                    "prometheus": {
+                        "metrics": {'lotus_job_count_submitted_day': data_float
+                                    },
+                        "labels": {
+                            "instance": "localhost:8091",
+                            "job": "prometheus",
+                            "metric_name":  'lotus_job_count_submitted_day'                           
+                        }
+                    },
+                    "event": {
+                        "duration": 5425153946,
+                        "dataset": "prometheus.collector",
+                        "module": "prometheus"
+                    },
+                    "metricset": {
+                        "period": 1200000,
+                        "name": "collector"
+                    },
+                    "service": {
+                        "address": "localhost:8091",
+                        "type": "prometheus"
+                    },
+                    "ecs": {
+                        "version": "1.4.0"
+                    },
+                    "host": {
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "architecture": "x86_64",
+                        "name": "metrics1.jasmin.ac.uk",
+                        "os": {
+                            "platform": "centos",
+                            "version": "7 (Core)",
+                            "family": "redhat",
+                            "name": "CentOS Linux",
+                            "kernel": "3.10.0-1062.18.1.el7.x86_64",
+                            "codename": "Core"
+                        },
+                        "containerized": False
+                    },
+                    "agent": {
+                        "ephemeral_id": "6570074e-f1f3-4fa3-aae4-e57ff12c71e6",
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "id": "515c3f57-1204-4a41-b84e-43c08b206a74",
+                        "version": "7.6.2",
+                        "type": "metricbeat"
+                    }
+                }
+            }
+    def get_lotus_core_hours_day(self, start, end):
+        dates = gen_time_list(start, end)
+
+        for d in dates:
+            t_dt = datetime.datetime.strptime(d, '%Y-%m-%dT%H:%M:%SZ')
+            data = self.lotus_core_hours(t_dt,t_dt)
+            try: 
+                data_float = float(data.sum().to_numpy()[0])
+            except AttributeError:
+                data_float = 0
+            yield {
+                "_index": "mjones-test2",
+                "_source": {
+                    "@timestamp": d,
+                    "prometheus": {
+                        "metrics": {'lotus_core_hours_day': data_float
+                                    },
+                        "labels": {
+                            "instance": "localhost:8091",
+                            "job": "prometheus",
+                            "metric_name":  'lotus_core_hours_day'                           
+                        }
+                    },
+                    "event": {
+                        "duration": 5425153946,
+                        "dataset": "prometheus.collector",
+                        "module": "prometheus"
+                    },
+                    "metricset": {
+                        "period": 1200000,
+                        "name": "collector"
+                    },
+                    "service": {
+                        "address": "localhost:8091",
+                        "type": "prometheus"
+                    },
+                    "ecs": {
+                        "version": "1.4.0"
+                    },
+                    "host": {
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "architecture": "x86_64",
+                        "name": "metrics1.jasmin.ac.uk",
+                        "os": {
+                            "platform": "centos",
+                            "version": "7 (Core)",
+                            "family": "redhat",
+                            "name": "CentOS Linux",
+                            "kernel": "3.10.0-1062.18.1.el7.x86_64",
+                            "codename": "Core"
+                        },
+                        "containerized": False
+                    },
+                    "agent": {
+                        "ephemeral_id": "6570074e-f1f3-4fa3-aae4-e57ff12c71e6",
+                        "hostname": "metrics1.jasmin.ac.uk",
+                        "id": "515c3f57-1204-4a41-b84e-43c08b206a74",
+                        "version": "7.6.2",
+                        "type": "metricbeat"
+                    }
+                }
+            }
+
 
 if __name__ == "__main__":
     lm = LotusMetrics()
