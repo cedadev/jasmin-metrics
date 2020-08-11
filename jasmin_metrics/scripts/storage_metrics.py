@@ -23,9 +23,9 @@ class StorageGather(object):
         """ Get the last storage from 'EquallogicTotal' measurements.
         """
 
-        last_res = self.client.query("select * from EquallogicTotals where {}}".format(time_range)) #time > now() - 1d
+        last_res = self.client.query("select * from EquallogicTotals where {}".format(time_range)) #time > now() - 1d
         if len(last_res) == 0:
-            last_res = self.client.query("select * from EquallogicTotals where {}}".format(backup_time_range)) # time > now() - 28h
+            last_res = self.client.query("select * from EquallogicTotals where {}".format(backup_time_range)) # time > now() - 28h
         
 
         raw_data = last_res.raw['series']
@@ -44,7 +44,7 @@ class StorageGather(object):
         """ Get the details of the last volume total usage from SCD's InfluxDB. From 'StorageTotals' measurements.
         """
 
-        last_res = self.client.query("select * from StorageTotals WHERE {}}".format(time_range))
+        last_res = self.client.query("select * from StorageTotals WHERE {}".format(time_range))
         raw_data = last_res.raw['series']
 
         data = {}
@@ -160,7 +160,7 @@ class StorageMetrics(StorageGather):
                 total['QB-cap'] += data[d]['rawcap'] / factor
                 total['QB-com'] += data[d]['rawuse'] / factor
 
-        data = self.get_scd_last_elt()
+        data = self.get_scd_last_elt(time_range='time > now() - 24h', backup_time_range='time > now() - 28h')
         for d in data:
             total['EL-cap'] += data[d]['rawcap'] / factor
             total['EL-use'] += data[d]['rawuse'] / factor
@@ -220,11 +220,11 @@ class StorageMetrics(StorageGather):
         return np.sum(self.gws_df['VolumeUsageGB'])
 
     def get_storage_total_archive_provision(self):
-        df = self.get_archive_df()
+        df = self.get_archive_df(time_range='time > now() - 1d')
         return np.sum(df['VolumeCapacityGB'])
 
     def get_storage_total_archive_used(self):
-        df= self.get_archive_df()
+        df= self.get_archive_df(time_range='time > now() - 1d')
         return np.sum(df['VolumeUsageGB'])
 
 
@@ -242,12 +242,15 @@ class StorageBackfill(StorageGather):
             d_end = datetime.datetime.strftime(t_dt+datetime.timedelta(days=1), '%Y-%m-%dT%H:%M:%SZ')
             time_range = "time >= '{}' AND time < '{}'".format(d,d_end)
             # Overwrite gws dataframe with current time period required
-            self.gws_df = self.get_gws_df(time_range=time_range)
+            try:
+                self.gws_df = self.get_gws_df(time_range=time_range)
+            except KeyError:
+                continue
 
             for index, gws in self.gws_df.iterrows():
                 consortium = "other"
                 gws_name = gws['VolumeName'].split('/')[-1]
-                gws_vol = gws['VolumeName'].split('/')[-1]
+                gws_vol = gws['VolumeName']
                 if re.match( 'vol\d', gws_name):
                     gws_name = gws['VolumeName'].split('/')[-2]
                 for index, line in self.gws_consortium.iterrows():
@@ -262,7 +265,7 @@ class StorageBackfill(StorageGather):
                 gws_name_to_pass = gws['VolumeName']
 
                 yield {
-                    "_index": "mjones-test2",
+                    "_index": "mjones-test4",
                     "_source": {
                         "@timestamp": d,
                         "prometheus": {
@@ -326,12 +329,15 @@ class StorageBackfill(StorageGather):
             d_end = datetime.datetime.strftime(t_dt+datetime.timedelta(days=1), '%Y-%m-%dT%H:%M:%SZ')
             time_range = "time >= '{}' AND time < '{}'".format(d,d_end)
             # Overwrite gws dataframe with current time period required
-            self.gws_df = self.get_gws_df(time_range=time_range)
+            try:
+                self.gws_df = self.get_gws_df(time_range=time_range)
+            except KeyError:
+                continue
 
             for index, gws in self.gws_df.iterrows():
                 consortium = "other"
                 gws_name = gws['VolumeName'].split('/')[-1]
-                gws_vol = gws['VolumeName'].split('/')[-1]
+                gws_vol = gws['VolumeName']
                 if re.match( 'vol\d', gws_name):
                     gws_name = gws['VolumeName'].split('/')[-2]
                 for index, line in self.gws_consortium.iterrows():
@@ -346,7 +352,7 @@ class StorageBackfill(StorageGather):
                 gws_name_to_pass = gws['VolumeName']
 
                 yield {
-                    "_index": "mjones-test2",
+                    "_index": "mjones-test4",
                     "_source": {
                         "@timestamp": d,
                         "prometheus": {

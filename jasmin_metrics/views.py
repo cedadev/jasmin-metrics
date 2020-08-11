@@ -1,5 +1,5 @@
 from .metrics import MetricsView
-from .scripts.reports import VolumeReport, GWSUsersReport
+from .scripts.reports import *
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -45,3 +45,10 @@ def gws_users_report(request):
     gr = GWSUsersReport()
     return gr.create_view()
 
+def gws_list_report(request):
+    gl = GWSList()
+    return gl.create_view()
+
+def gws_scanner_report(request):
+    gm = GWSScannerInput()
+    return gm.create_view()
