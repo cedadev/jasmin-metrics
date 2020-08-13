@@ -1,0 +1,25 @@
+# located at /etc/uwsgi/sites/jasmin-metrics.ini
+[uwsgi]
+project = jasmin_metrics
+username = nginx
+base = /root
+
+chdir = %(base)/jasmin-metrics
+home = %(base)/venv
+module = jasmin_metrics.wsgi:application
+
+master = true
+processes = 5
+
+uid = %(username)
+socket = /run/uwsgi/%(project).sock
+chown-socket = %(username):nginx
+chmod-socket = 660
+vacuum = true
+
+http-timeout = 300
+
+reload-mercy=300
+socket-timeout=300
+worker-reload-mercy=300
+max-worker-lifetime = 3600

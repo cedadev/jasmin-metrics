@@ -144,7 +144,7 @@ class MetricsView(object):
     
                 elif m == 'users_jasmin_country':
                     for c in self.users.get_list_countries():
-                        print('Working on {}'.format(c))
+                        #print('Working on {}'.format(c))
                         self.service_status_list[m].labels(metric_name=m, country=c).set(self.met_funcs[m](c))
     
                 elif m.startswith('tape_gws'):

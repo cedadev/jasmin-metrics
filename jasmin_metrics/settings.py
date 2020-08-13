@@ -154,4 +154,4 @@ JASMIN_AUTH = {
 }
 
 AUTH_USER_MODEL = 'jasmin_auth.JASMINUser'
-
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")

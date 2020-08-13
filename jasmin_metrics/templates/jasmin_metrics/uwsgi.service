@@ -1,0 +1,15 @@
+[Unit]
+Description=uWSGI Emperor service
+
+[Service]
+Environment=JASMIN_METRICS_ROOT=/root/jasmin-metrics/jasmin_metrics/
+ExecStartPre=/usr/bin/bash -c 'mkdir -p /run/uwsgi; chown nginx:nginx /run/uwsgi'
+ExecStart=/root/venv/bin/uwsgi --emperor /etc/uwsgi/sites
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+NotifyAccess=all
+
+
+[Install]
+WantedBy=multi-user.target
